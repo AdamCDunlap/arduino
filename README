@@ -1,0 +1,9 @@
+These are all of my files I wrote for arduino. Some are for 0022, some are for
+1.0. I've tried to keep the files for 0022 with the .pde extension and the ones
+for 1.0 with the .ino extension, but mistakes are made.
+
+Some of the libraries here are written by other people are are quite possibly
+copyrighted. However, nothing in here was bought.
+
+Some files have the .vi extensions; these are files for a language called
+LabVIEW.
