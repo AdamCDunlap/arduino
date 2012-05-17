@@ -141,7 +141,7 @@ void LEDArray::drawRow(uint8_t picture, uint8_t row) {
 	sendData(((row + 1) << 8) | picture);
 }
 
-void LEDArray::drawPicPmem(unsigned char* pictureInMemory){
+void LEDArray::drawPicPmem(const unsigned char* pictureInMemory){
 	uint8_t picture[8] = {0,0,0,0,0,0,0,0};
 	for(uint8_t i=0;i<8;i++){
 		picture[i] = pgm_read_byte_near(&pictureInMemory[i]); //read one byte (one row) from program memory

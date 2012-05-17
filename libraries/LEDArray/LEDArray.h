@@ -57,7 +57,7 @@ class LEDArray : public Print {
         void allOn();
         void setPrintDuration(unsigned int time);
 		void sendData(int data);
-		void drawPicPmem (unsigned char* picture);
+		void drawPicPmem (const unsigned char* picture);
         void setPrintType(printTypes type);
         void setPrintBlock(printBlock_t option);
 #if ARDUINO >= 100
