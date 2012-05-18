@@ -13,7 +13,7 @@ public:
     //   and 0 to 62,832 in gyro
     // x: lateral movement, y: forward movement, z: rotational movement
     //   gyro: 
-    void Move(int x, int y, int z, unsigned int gyro=0);
+    void Move(int x, int y, int z = 0, unsigned int gyro=0);
 
     // Moves one motor given a value from -1000 to 1000
     // motornum is 0-2
