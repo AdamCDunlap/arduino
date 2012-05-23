@@ -36,9 +36,10 @@ namespace st { // States for state machine
         beginning,
         beforeButton,
         afterButtonWait,
-        startrace,
         firstStraightaway,
-        curve,
+        firstcurve,
+        bigcurve,
+        thirdcurve,
         secondStraightaway,
     };
     enum statepos_t {
@@ -49,6 +50,10 @@ namespace st { // States for state machine
     enum substate_t {
         noSubstate,
         backing,
+    };
+    enum direction_t {
+        clockwise,
+        counterclockwise,
     };
 }
     
@@ -92,12 +97,12 @@ void loop() {
     static unsigned long lastPrintTime = 0;
     if (millis() - lastPrintTime > 100) {
         lastPrintTime = millis();
-//        Serial.print(leftDist);
-//        Serial.print('\t');
-//        Serial.print(rightDist);
-//        Serial.print('\t');
-//
-//        Serial.println();
+        Serial.print(leftDist);
+        Serial.print('\t');
+        Serial.print(rightDist);
+        Serial.print('\t');
+
+        Serial.println();
     }
 // 2.Police state machine
     int8_t jagspeed = 0; // -100 to 100
@@ -107,6 +112,7 @@ void loop() {
     static st::robotstate_t nextrobotstate = st::beforeButton;
     st::statepos_t statepos = st::begin;
     static st::substate_t substate = st::noSubstate;
+    static st::direction_t direction;
 
     if (statepos == st::begin) statepos = st::idle;
 
@@ -127,55 +133,71 @@ void loop() {
         if(startButton) nextrobotstate = st::afterButtonWait;
         break;
     case st::afterButtonWait:
-        if(timeIntoState > 1000) nextrobotstate = st::startrace;
+        if(timeIntoState > 1000) nextrobotstate = st::firstStraightaway;
         break;
-    case st::startrace:
-        if (timeIntoState > 500) nextrobotstate = st::firstStraightaway;
-        jagspeed = 100;
-        turnamt = 0;
-        break;
-    case st::firstStraightaway: case st::curve: case st::secondStraightaway:
-        if(timeIntoState > 13000)
-            nextrobotstate = st::beginning;
+    case st::firstStraightaway:
         jagspeed = 40;
-        turnamt = 10;
-        if (substate == st::backing) {
-            if (millis() - timePlaceholder > 1500) {
-                substate = st::noSubstate;
-            }
-            jagspeed = -13;
-            turnamt = 30;
+        turnamt = 0;
+        if (leftDist > leftDistThresh && timeIntoState > 500) {
+            nextrobotstate = st::firstcurve;
+            direction = st::counterclockwise;
         }
-        else if (leftDist > leftDistThresh && rightDist <= rightDistThresh) {
-            jagspeed = 27;
-            turnamt = 60;
+        if (rightDist > rightDistThresh) {
+            nextrobotstate = st::firstcurve;
+            direction = st::clockwise;
         }
-        else if (leftDist <= leftDistThresh &&  rightDist > rightDistThresh) {
-            jagspeed = 27;
-            turnamt = -60;
-        }
-        else if (leftDist >= leftDistThresh && rightDist >= rightDistThresh) {
-            jagspeed = -13;
-            turnamt = 30;
-            substate = st::backing;
-            timePlaceholder = millis();
+        
+        break;
+        
+    case st::firstcurve:
+        if (timeIntoState > 500 && timeIntoState > 500) nextrobotstate = st::bigcurve;
+        jagspeed = 30;
+        if (direction == st::clockwise) {
+            turnamt = 20;
         }
         else {
-            jagspeed = 30;
-            turnamt = 0;
+            turnamt = -20;
         }
         break;
-//        
-//        case st::curve:
-//            if (timeIntoState > 6500) nextrobotstate = st::secondStraightaway;
-//            jagspeed = 24;
-//            turnamt = -25;
-//            break;
-//        case st::secondStraightaway:
-//            if (timeIntoState > 7000) nextrobotstate = st::beforeButton;
-//            jagspeed = 40;
-//            turnamt = 25;
-//            break;
+        
+    case st::bigcurve:
+        if (timeIntoState > 6500) nextrobotstate = st::secondStraightaway;
+        
+        if (direction == st::clockwise) {
+            if (leftDist > leftDistThresh && rightDist <= rightDistThresh) {
+                jagspeed = 15;
+                turnamt = 0;
+            }
+            else if (leftDist <= leftDistThresh &&  rightDist > rightDistThresh) {
+                jagspeed = 15;
+                turnamt = -70;
+            }
+            else {
+                jagspeed = 25;
+                turnamt = -30;
+            }
+        }
+        else {
+            if (leftDist < leftDistThresh && rightDist >= rightDistThresh) {
+                jagspeed = 15;
+                turnamt = 0;
+            }
+            else if (leftDist >= leftDistThresh &&  rightDist < rightDistThresh) {
+                jagspeed = 15;
+                turnamt = -70;
+            }
+            else {
+                jagspeed = 25;
+                turnamt = -30;
+            }
+        }
+        break;
+        
+    case st::secondStraightaway:
+        if (timeIntoState > 7000) nextrobotstate = st::beforeButton;
+        jagspeed = 40;
+        turnamt = 25;
+        break;
     default:
         Serial.print("Undefined state: "); Serial.print(robotstate); Serial.print('\t');
     }
