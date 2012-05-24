@@ -131,10 +131,10 @@ void updatemove(char x, char y) {
     float total = 0;
     for (size_t i=0; i<height; i++) {
         for (size_t j=0; j<width; j++) {
-            if (i-y > height || i-y < 0 || j-x > width || j-x < 0)  {
-                newprobs[i][j] = 0;
-            }
-            else {
+            //if (i-y > height || i-y < 0 || j-x > width || j-x < 0)  {
+            //    newprobs[i][j] = 0;
+            //}
+            //else {
                 newprobs[i][j] =
                   // Moved as expected
 //                  getprob(i-y, j-x) +
@@ -155,7 +155,7 @@ void updatemove(char x, char y) {
                   0;
 
                 total += newprobs[i][j];
-            }
+            //}
         }
     }
 

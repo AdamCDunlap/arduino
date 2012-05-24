@@ -3,7 +3,6 @@
 // Get the line numbering to behave
 byte dummy;
 #line 6
-//#define PROPROTIONAL
 
 // Inputs
 const byte startPin = 12;
@@ -42,6 +41,7 @@ namespace st { // States for state machine
         firstStraightaway,
         curve,
         secondStraightaway,
+        finalcountdown,
     };
     enum statepos_t {
         begin,
@@ -143,22 +143,30 @@ void loop() {
         turnamt = 0;
         break;
     case st::goingForFirstWall:
-        nextrobotstate = st::firstStraightaway;
-//        if (leftDist > leftDistThresh) {
-//            direction = st::counterclockwise;
-//            nextrobotstate = st::firstStraightaway;
-//            digitalWrite(rightledpow, HIGH);
-//        }
-//        if (rightDist > rightDistThresh) {
-//            direction = st::clockwise;
-//            nextrobotstate = st::firstStraightaway;
-//            digitalWrite(rightledpow, LOW);
-//        }
-//        jagspeed = 30;
-//        turnamt = 0;
+        if (leftDist > 135) {
+            direction = st::counterclockwise;
+            nextrobotstate = st::firstStraightaway;
+            digitalWrite(rightledpow, HIGH);
+        }
+        if (rightDist > 135) {
+            direction = st::clockwise;
+            nextrobotstate = st::firstStraightaway;
+            digitalWrite(rightledpow, LOW);
+        }
+        jagspeed = 20;
+        turnamt = 0;
         break;
-    case st::firstStraightaway: case st::curve: case st::secondStraightaway:
-        if(timeIntoState > 13000)
+    case st::firstStraightaway:
+        if(timeIntoState > 100) nextrobotstate = st::curve;
+        jagspeed = 20;
+        if (direction == st::clockwise) turnamt = -20;
+        else if (direction == st::counterclockwise) turnamt = 20;
+        else nextrobotstate = st::curve;
+        
+        break;
+    
+    case st::curve: 
+        if(timeIntoState > 4500)
             nextrobotstate = st::secondStraightaway;
         if (substate == st::backing) {
             if (millis() - timePlaceholder > 1500) {
@@ -175,49 +183,90 @@ void loop() {
             }
             jagspeed = -13;
         }
-        #ifndef PROPORTIONAL
         else if (leftDist > leftDistThresh && rightDist <= rightDistThresh) {
             jagspeed = 24;
-            turnamt = 40;
+            if (direction == st::clockwise)
+                turnamt = 10;
+            else if (direction == st::counterclockwise)
+                turnamt = 50;
         }
         else if (leftDist <= leftDistThresh &&  rightDist > rightDistThresh) {
             jagspeed = 24;
-            turnamt = -40;
+            if (direction == st::clockwise)
+                turnamt = -50;
+            else if (direction == st::counterclockwise)
+                turnamt = -10;
         }
-        else
-        #endif
-        if (leftDist >= leftDistThresh && rightDist >= rightDistThresh) {
+        else if (leftDist >= leftDistThresh && rightDist >= rightDistThresh) {
             // Both sensors see a wall
             jagspeed = -13;
             turnamt = 0;
             substate = st::backing;
             timePlaceholder = millis();
         }
-        #ifdef PROPORTIONAL
-        else if (leftDist <= leftDistThresh && rightDist <= rightDistThresh) {
-            jagspeed = 40;
-            turnamt = 0;
-        }
+       
         else {
-            turnamt = (leftDist - rightDist);
             jagspeed = 30;
-            turnamt = 0;
-        }
-        #else
-        else {
-            jagspeed = 27;
             if (direction == st::clockwise) {
-                turnamt = -25;
+                turnamt = 32;
             }
             else if (direction == st::counterclockwise) {
-                turnamt = 25;
+                turnamt = -32;
             }
             else {
                 turnamt = 0;
             }
         }
-        #endif
+
         break;
+    case st::secondStraightaway:
+        if (timeIntoState > 300) nextrobotstate = st::finalcountdown;
+        if (direction == st::clockwise) {
+            turnamt = 60;
+        }
+        else {
+            turnamt = -60;
+        }
+        break;
+    case st::finalcountdown:
+        if(timeIntoState > 7000)
+            nextrobotstate = st::beginning;
+        
+        if (substate == st::backing) {
+            if (millis() - timePlaceholder > 1500) {
+                substate = st::noSubstate;
+            }
+            if (direction == st::clockwise) {
+                turnamt = -30;
+            }
+            else if (direction == st::counterclockwise) {
+                turnamt = 30;
+            }
+            else {
+                turnamt = 30;
+            }
+            jagspeed = -13;
+        }
+        
+        if (leftDist > leftDistThresh && rightDist <= rightDistThresh) {
+            jagspeed = 27;
+            turnamt = 60;
+        }
+        else if (leftDist <= leftDistThresh &&  rightDist > rightDistThresh) {
+            jagspeed = 27;
+            turnamt = -60;
+        }
+        else if (leftDist >= leftDistThresh && rightDist >= rightDistThresh) {
+            // Both sensors see a wall
+            jagspeed = -13;
+            turnamt = 0;
+            substate = st::backing;
+            timePlaceholder = millis();
+        }
+        else {
+            jagspeed = 30;
+            turnamt = 0;
+        }
 //       
 //        case st::curve:
 //            if (timeIntoState > 6500) nextrobotstate = st::secondStraightaway;

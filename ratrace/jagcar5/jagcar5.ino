@@ -24,8 +24,8 @@ const byte pwrledgnd = 5;
 
 Servo jag;
 Servo steer;
-const unsigned int leftDistThresh = 150;
-const unsigned int rightDistThresh = 150;
+const unsigned int leftDistThresh = 200;
+const unsigned int rightDistThresh = 200;
 
 // Returns distance in cm
 byte readIR(const byte pin) {
@@ -138,24 +138,9 @@ void loop() {
         if(timeIntoState > 1000) nextrobotstate = st::startrace;
         break;
     case st::startrace:
-        if (timeIntoState > 500) nextrobotstate = st::goingForFirstWall;
+        if (timeIntoState > 500) nextrobotstate = st::curve;
         jagspeed = 100;
         turnamt = 0;
-        break;
-    case st::goingForFirstWall:
-        nextrobotstate = st::firstStraightaway;
-//        if (leftDist > leftDistThresh) {
-//            direction = st::counterclockwise;
-//            nextrobotstate = st::firstStraightaway;
-//            digitalWrite(rightledpow, HIGH);
-//        }
-//        if (rightDist > rightDistThresh) {
-//            direction = st::clockwise;
-//            nextrobotstate = st::firstStraightaway;
-//            digitalWrite(rightledpow, LOW);
-//        }
-//        jagspeed = 30;
-//        turnamt = 0;
         break;
     case st::firstStraightaway: case st::curve: case st::secondStraightaway:
         if(timeIntoState > 13000)
@@ -175,35 +160,21 @@ void loop() {
             }
             jagspeed = -13;
         }
-        #ifndef PROPORTIONAL
         else if (leftDist > leftDistThresh && rightDist <= rightDistThresh) {
             jagspeed = 24;
-            turnamt = 40;
+            turnamt = 50;
         }
         else if (leftDist <= leftDistThresh &&  rightDist > rightDistThresh) {
             jagspeed = 24;
-            turnamt = -40;
+            turnamt = -50;
         }
-        else
-        #endif
-        if (leftDist >= leftDistThresh && rightDist >= rightDistThresh) {
-            // Both sensors see a wall
-            jagspeed = -13;
-            turnamt = 0;
-            substate = st::backing;
-            timePlaceholder = millis();
-        }
-        #ifdef PROPORTIONAL
-        else if (leftDist <= leftDistThresh && rightDist <= rightDistThresh) {
-            jagspeed = 40;
-            turnamt = 0;
-        }
-        else {
-            turnamt = (leftDist - rightDist);
-            jagspeed = 30;
-            turnamt = 0;
-        }
-        #else
+//        else if (leftDist >= leftDistThresh && rightDist >= rightDistThresh) {
+//            // Both sensors see a wall
+//            jagspeed = -13;
+//            turnamt = 0;
+//            substate = st::backing;
+//            timePlaceholder = millis();
+//        }
         else {
             jagspeed = 27;
             if (direction == st::clockwise) {
@@ -216,7 +187,6 @@ void loop() {
                 turnamt = 0;
             }
         }
-        #endif
         break;
 //       
 //        case st::curve:
