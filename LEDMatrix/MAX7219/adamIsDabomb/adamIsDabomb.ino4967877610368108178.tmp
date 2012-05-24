@@ -1,0 +1,12 @@
+#include <LEDArray.h>
+
+LEDArray disp(9, 13, 10);
+
+void setup(){
+  disp.setPrintDuration(500);
+  disp.setPrintType(SCROLL);
+}
+
+void loop(){
+  disp.println("Adam is da bomb!!!");
+}

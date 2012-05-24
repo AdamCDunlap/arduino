@@ -13,16 +13,10 @@ ISR(TIMER1_OVF_vect) {
 
 LEDArray::LEDArray(uint8_t _dataPin, uint8_t _clockPin, 
 	               uint8_t _latchPin, uint8_t _numberOfMatricies) : printBuffer() {
-	dataPin = _dataPin;
-	clockPin = _clockPin;
-	latchPin = _latchPin;
+    dataPin = _dataPin;
+    clockPin = _clockPin;
+    latchPin = _latchPin;
     numberOfMatricies = _numberOfMatricies;
-    charDone = true;
-
-    for(uint8_t i=0;i<8;i++){
-        scrollBuffer[i] = 0;
-    }
-
     dataBit = digitalPinToBitMask(dataPin);  // Adapted from digitalWrite
     clockBit = digitalPinToBitMask(clockPin);
     latchBit = digitalPinToBitMask(latchPin);
@@ -41,6 +35,17 @@ LEDArray::LEDArray(uint8_t _dataPin, uint8_t _clockPin,
     #elif defined(UCSR0B)
         UCSR0B = 0;
     #endif
+    
+    initialize();
+ }
+
+void LEDArray::initialize() {
+
+    charDone = true;
+
+    for(uint8_t i=0;i<8;i++){
+        scrollBuffer[i] = 0;
+    }
 
 	pinMode(dataPin, OUTPUT);
 	pinMode(clockPin, OUTPUT);
@@ -48,7 +53,7 @@ LEDArray::LEDArray(uint8_t _dataPin, uint8_t _clockPin,
 	digitalWrite(dataPin, LOW);
 	digitalWrite(clockPin, LOW);
 	digitalWrite(latchPin, LOW);
-    sendData(0x00); //Try to clear the line so that only good date gets through
+    sendData(0x00); //Try to clear the line so that only good data gets through
 //	for(uint8_t i=0; i<numberOfMatricies;i++){
 		sendData(0x0900); //Decode Mode: None
 		sendData(0x0A0F); //Intensity: 31/32 (Max)
