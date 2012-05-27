@@ -4,12 +4,13 @@
 #include <CircleBot.h>
 #include <AFMotor.h>
 #define DEBUG
+#define LEDARRAY
 
 #if 0
 char dummy;
 // Arduino puts all of its own malformed prototypes in here
 #endif
-#line 12 // Tell the compiler this is line 12 even though arduino adds some
+#line 13 // Tell the compiler this is line 13 even though arduino adds some
          // things before it
 
 // This may be changed to a fixed-point arithmetic class for speed and memory
@@ -57,8 +58,8 @@ CircleBot bot(1, 3, 4);
 
 const prob_t senseprob = .99;
 
-const size_t width = 8;
-const size_t height = 16;
+const size_t width  = 8;
+const size_t height = 8;
 const byte world[height][(width+7)/8] PROGMEM = {
     {B00001000},
     {B00100101},
@@ -68,14 +69,6 @@ const byte world[height][(width+7)/8] PROGMEM = {
     {B11000000},
     {B11001001},
     {B11000100},
-    {B01100100},
-    {B01101010},
-    {B11100000},
-    {B10100011},
-    {B11010111},
-    {B01011010},
-    {B00101001},
-    {B01111101},
 };
 
 // Holds all of the probabilities for each square
@@ -168,7 +161,7 @@ void updatemove(char x, char y) {
 }
 
 void printProbs() {
-#ifdef DEBUG
+    #if defined LEDARRAY || defined DEBUG
     prob_t maximum = 0;
     for(size_t i=0; i<height; i++) {
         for(size_t j=0; j<width; j++) {
@@ -178,17 +171,35 @@ void printProbs() {
     maximum -= 0.005; // Give a little leeway
     DEBUG_VAR(maximum, 6);
 
+    #ifdef LEDARRAY
+    byte ledpic[8];
+    #endif
+
     for(size_t i=0; i<height; i++){
+        #ifdef DEBUG
         Serial.print("probs: {");
+        #endif
         for(size_t j=0; j<width; j++){
+            #ifdef DEBUG
             if (probs[i][j] > maximum) Serial.print('*');
             else Serial.print(' ');
             Serial.print(probs[i][j], 6);
             Serial.print(",");
+            #endif
+            #ifdef LEDARRAY
+            bitWrite(ledpic[i], j, probs[i][j] > maximum);
+            #endif
         }
+        #ifdef DEBUG
         Serial.println("},");
+        #endif
     }
-#endif // DEBUG
+
+    #ifdef LEDARRAY
+    disp.drawpic(ledpic);
+    #endif
+
+    #endif // LEDARRAY || DEBUG
 }
 
 

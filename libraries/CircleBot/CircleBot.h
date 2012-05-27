@@ -7,7 +7,7 @@ class CircleBot {
 public:
     // Constructor
     // Use numbers printed on shield
-    CircleBot(uint8_t mtr0num=1, uint8_t mtr1num=2, uint8_t mtr2num=3);
+    CircleBot(uint8_t mtr0num=1, uint8_t mtr1num=3, uint8_t mtr2num=4);
 
     // Moves the robot given values from -1000 to 1000 in x, y, and z
     //   and 0 to 62,832 in gyro
@@ -41,11 +41,14 @@ private:
     static const uint8_t numMtrs = 3;
 
     AF_DCMotor mtrs[numMtrs];
+//    AF_DCMotor mtrs0;
+//    AF_DCMotor mtrs1;
+//    AF_DCMotor mtrs2;
 
     static const int cosOneTwenty = -500;
-    static const int sinOneTwenty = 866;
-    static const int sinTwoForty = -866;
-    static const int cosTwoForty = -500;
+    static const int sinOneTwenty = +866;
+    static const int sinTwoForty  = -866;
+    static const int cosTwoForty  = -500;
 };
 
 #endif

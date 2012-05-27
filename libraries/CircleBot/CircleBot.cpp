@@ -1,4 +1,3 @@
-
 #include "CircleBot.h"
 #include <Arduino.h>
 
@@ -40,9 +39,9 @@ void CircleBot::Move(int x, int y, int z, unsigned int gyro) {
     speed1 /= speedDivisor;
     speed0 /= speedDivisor;
 
-    RunMotor(0, speed0);
+    RunMotor(0,  speed0);
     RunMotor(1, -speed1); // This motor is backward
-    RunMotor(2, speed2);
+    RunMotor(2,  speed2);
 
     debugInfo.rotatedInputs.x = x;
     debugInfo.rotatedInputs.y = y;
@@ -79,10 +78,8 @@ void CircleBot::RunMotors(int speed0, int speed1, int speed2) {
 // Moves one motor given a value from -255 to 255 without scaling
 // motornum is 0-2
 void CircleBot::RunRawMotor(uint8_t motornum, int speed) {
-    uint8_t drctn;
 
-    if (speed < 0) {drctn = BACKWARD;}
-    else           {drctn = FORWARD;}
+    uint8_t drctn = speed < 0? BACKWARD : FORWARD;
 
     mtrs[motornum].setSpeed(abs(speed)); //set the speed
     mtrs[motornum].run(drctn); //run the motor
