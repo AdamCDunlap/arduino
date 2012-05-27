@@ -43,21 +43,21 @@ private:
 };
 
 class LEDArray : public Print {
-	public:
-		LEDArray (uint8_t _dataPin, uint8_t _clockPin, uint8_t _latchPin, uint8_t _numberOfMatricies = 1);
-		~LEDArray();
-		void drawPic (uint8_t* picture);
-		void drawRow (uint8_t picture, uint8_t row);
-		void setBrightness (uint8_t brightness);
-		void shutdown();
-		void wakeUp();
-		void test();
-		void stopTest();
-		void clear();
+public:
+        LEDArray (uint8_t _dataPin, uint8_t _clockPin, uint8_t _latchPin, uint8_t _numberOfMatricies = 1);
+        ~LEDArray();
+        void drawPic (uint8_t* picture);
+        void drawRow (uint8_t picture, uint8_t row);
+        void setBrightness (uint8_t brightness);
+        void shutdown();
+        void wakeUp();
+        void test();
+        void stopTest();
+        void clear();
         void allOn();
         void setPrintDuration(unsigned int time);
-		void sendData(int data);
-		void drawPicPmem (const unsigned char* picture);
+        void sendData(int data);
+        void drawPicPmem (const unsigned char* picture);
         void setPrintType(printTypes type);
         void setPrintBlock(printBlock_t option);
 #if ARDUINO >= 100
@@ -67,6 +67,7 @@ class LEDArray : public Print {
 #endif
         void backspace();
         void printRoutine();
+        void initialize();
 //    virtual void write(const char *str);
 	private:
         void scrollRow(uint8_t rowBuffer);
