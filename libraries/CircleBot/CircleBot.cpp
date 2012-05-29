@@ -1,15 +1,19 @@
 #include "CircleBot.h"
 #include <Arduino.h>
 
+inline void* operator new (size_t, void* buf) { return buf; }
 // Constructor
 // Use numbers printed on shield
 CircleBot::CircleBot(uint8_t mtr0num, uint8_t mtr1num, uint8_t mtr2num)
-    : mtrs({mtr0num, mtr1num, mtr2num})
+//    : mtrs({mtr0num, mtr1num, mtr2num})
+
 //    : mtrs[0](mtr0num)
 //    , mtrs[1](mtr1num)
 //    , mtrs[2](mtr2num)
 {
-
+    mtrs = new(spaceformtrs) AF_DCMotor(mtr0num);
+    new(spaceformtrs+1) AF_DCMotor(mtr1num);
+    new(spaceformtrs+2) AF_DCMotor(mtr2num);
 }
 
 // Moves the robot given values from -1000 to 1000 in x, y, and z

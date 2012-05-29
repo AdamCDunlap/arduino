@@ -40,7 +40,11 @@ public:
 private:
     static const uint8_t numMtrs = 3;
 
-    AF_DCMotor mtrs[numMtrs];
+    // create space for the motors beforehand and use placement new
+    AF_DCMotor* mtrs;
+    char spaceformtrs[sizeof(AF_DCMotor) * numMtrs];
+
+    //AF_DCMotor mtrs[numMtrs];
 //    AF_DCMotor mtrs0;
 //    AF_DCMotor mtrs1;
 //    AF_DCMotor mtrs2;
