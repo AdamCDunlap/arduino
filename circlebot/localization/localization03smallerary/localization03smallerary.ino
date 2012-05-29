@@ -3,6 +3,7 @@
 #include <avr/pgmspace.h>
 #include <CircleBot.h>
 #include <AFMotor.h>
+#include <LEDArray.h>
 #define DEBUG
 #define LEDARRAY
 
@@ -10,7 +11,7 @@
 char dummy;
 // Arduino puts all of its own malformed prototypes in here
 #endif
-#line 13 // Tell the compiler this is line 13 even though arduino adds some
+#line 14 // Tell the compiler this is line 13 even though arduino adds some
          // things before it
 
 // This may be changed to a fixed-point arithmetic class for speed and memory
@@ -27,6 +28,9 @@ void setup();
 void loop();
 
 CircleBot bot(1, 3, 4);
+#ifdef LEDARRAY
+LEDArray disp(9, 13, 10);
+#endif
 
 #ifdef DEBUG
 #define DEBUG_VAR(x, ...) do {Serial.print(#x ": "); Serial.println(x, ##__VA_ARGS__);} while(false)
@@ -196,7 +200,7 @@ void printProbs() {
     }
 
     #ifdef LEDARRAY
-    disp.drawpic(ledpic);
+    disp.drawPic(ledpic);
     #endif
 
     #endif // LEDARRAY || DEBUG
