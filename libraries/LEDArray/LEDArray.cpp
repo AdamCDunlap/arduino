@@ -53,6 +53,10 @@ void LEDArray::initialize() {
 	digitalWrite(dataPin, LOW);
 	digitalWrite(clockPin, LOW);
 	digitalWrite(latchPin, LOW);
+
+    digitalWrite(connectedPin, HIGH); // Enable pullup
+    wasDispConnected = true;
+
     sendData(0x00); //Try to clear the line so that only good data gets through
 //	for(uint8_t i=0; i<numberOfMatricies;i++){
 		sendData(0x0900); //Decode Mode: None
@@ -70,9 +74,13 @@ LEDArray::~LEDArray(){
 	pinMode(dataPin, INPUT);
 	pinMode(clockPin, INPUT);
 	pinMode(latchPin, INPUT);
+    digitalWrite(connectedPin, LOW);
 }
 
 void LEDArray::sendData(int data){
+
+  if (isConnected()) return;
+
   uint8_t oldSREG;
   for (int i=0;i<16;i++) {
     if (data & (_BV(15-i))){ //If the (15-i)th bit of data is 1:
@@ -95,6 +103,14 @@ void LEDArray::sendData(int data){
   *latchOut &= latchBitNOT;  //digitalWrite(latchPin, LOW);
   *dataOut &= dataBitNOT;    //digitalWrite(dataPin, LOW);
   SREG = oldSREG;            //Restore interrupts
+}
+
+bool LEDArray::isConnected() {
+  if (connectedPin < 0) return true; // Assume it's connected if there's no pin
+  bool ret = !digitalRead(connectedPin);
+  if (ret && !wasDispConnected) initialize();
+  wasDispConnected = ret;
+  return ret;
 }
 
 void LEDArray::setBrightness(uint8_t brightness){

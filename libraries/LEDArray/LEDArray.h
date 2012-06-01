@@ -44,7 +44,7 @@ private:
 
 class LEDArray : public Print {
 public:
-        LEDArray (uint8_t _dataPin, uint8_t _clockPin, uint8_t _latchPin, uint8_t _numberOfMatricies = 1);
+        LEDArray (uint8_t _dataPin, uint8_t _clockPin, uint8_t _latchPin, uint8_t _connectedPin = -1);
         ~LEDArray();
         void drawPic (uint8_t* picture);
         void drawRow (uint8_t picture, uint8_t row);
@@ -73,9 +73,12 @@ public:
         void scrollRow(uint8_t rowBuffer);
         unsigned int getDelayTime();
         bool charDone;
+
 	    uint8_t dataPin;
 	    uint8_t clockPin;
 	    uint8_t latchPin;
+        uint8_t connectedPin;
+
         uint8_t dataBit;
         uint8_t clockBit;
         uint8_t latchBit;
@@ -92,6 +95,9 @@ public:
         uint8_t scrollBuffer[8];
         CircularBuffer<20> printBuffer;
         uint8_t currentBrightness;
+
+        bool wasDispConnected;
+        bool isConnected();
 };
 
 class numDisplay {
