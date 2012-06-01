@@ -17,8 +17,8 @@ const byte jagPin = 9;
 const byte steerPin = 8;
 const byte rightledpow = A2;
 const byte rightledgnd = A3;
-const byte leftledpow = 2;
-const byte leftledgnd = 3;
+const byte leftledpow = 7;
+const byte leftledgnd = 4;
 const byte pwrledpow = 6;
 const byte pwrledgnd = 5;
 
@@ -37,11 +37,14 @@ namespace st { // States for state machine
         beginning,
         beforeButton,
         afterButtonWait,
-        startrace,
-        goingForFirstWall,
-        firstStraightaway,
-        curve,
-        secondStraightaway,
+        redneck,
+        findDirection,
+        straightaway,
+        uturn,
+        farS,
+        midS,
+        closeS,
+        ccwFinish,
     };
     enum statepos_t {
         begin,
@@ -92,8 +95,8 @@ void loop() {
     bool leftFeeler = !digitalRead(leftFeelerPin);
     bool startButton = !digitalRead(startPin);
     // Display debugging leds
-//    digitalWrite(leftledpow, leftDist > leftDistThresh);
-//    digitalWrite(rightledpow, rightDist > leftDistThresh);
+    digitalWrite(leftledpow, leftDist > leftDistThresh);
+    digitalWrite(rightledpow, rightDist > leftDistThresh);
 //    digitalWrite(pwrledpow, powerlvl < 3700);
     
     static unsigned long lastPrintTime = 0;
@@ -137,7 +140,7 @@ void loop() {
     case st::afterButtonWait:
         if(timeIntoState > 1000) nextrobotstate = st::startrace;
         break;
-    case st::startrace:
+    case st::redneck:
         if (timeIntoState > 500) nextrobotstate = st::goingForFirstWall;
         jagspeed = 100;
         turnamt = 0;
