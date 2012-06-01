@@ -80,6 +80,9 @@ void avoidWalls(unsigned int leftDist, unsigned int rightDist,
         *jagspeed = nominalspeed;
     }
 }
+#define AVOID_WALLS(nominalspeed, nominalsteer)\
+    avoidWalls(leftDist, rightDist, &jagspeed, &turnamt,\
+               nominalspeed, nominalsteer)
     
           
 void setup() {
@@ -166,7 +169,7 @@ void loop() {
         turnamt = 0;
         break;
     case st::findDirection:
-        avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 20, 0);
+        AVOID_WALLS(20, 0);
         if (leftFeeler) {
             nextrobotstate = st::closeS;
             direction = st::counterclockwise;
@@ -178,11 +181,11 @@ void loop() {
         break;
     case st::straightaway:
         if (direction == st::clockwise) {
-            avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 27, 0);
+            AVOID_WALLS(27, 0);
             if (leftFeeler) nextrobotstate = st::uturn;
         }
         else {
-            avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 30, 0);
+            AVOID_WALLS(40, 0);
             if (timeIntoState > 15000) nextrobotstate = st::beforeButton;
         }
         break;
@@ -193,57 +196,43 @@ void loop() {
             turnamt = 80;
         }
         else {
-            if (timeIntoState > 1000) nextrobotstate = straightaway;
+            if (timeIntoState > 1000) nextrobotstate = st::straightaway;
             jagspeed = 30;
             turnamt = -80;
         }
         break;
-    case farstraightaway:
+    case st::farstraightaway:
         if (timeIntoState > 200) {
             if (direction == st::clockwise) nextrobotstate = st::farS;
             else nextrobotstate = st::uturn;
         }
-        avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 40, 0);        
+        AVOID_WALLS(30, 0);
         break;
-    case farS:
+    case st::farS:
         if (timeIntoState > 200) {
             if (direction == st::clockwise) nextrobotstate = st::midS;
             else nextrobotstate = st::farstraightaway;
         }
-        if (direction == st::clockwise) {
-            avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 20, 30);
-        }
-        else {
-            avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 20, -30);
-        }
+
+        AVOID_WALLS(20, direction==st::clockwise? 30 : -30);
         break;
-    case midS:
+    case st::midS:
         if (timeIntoState > 200) {
             if (direction == st::clockwise) nextrobotstate = st::closeS;
             else nextrobotstate = st::farS;
         }
-        if (direction == st::clockwise) {
-            avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 20, -30);
-        }
-        else {
-            avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 20, 30);
-        }
+        AVOID_WALLS(20, direction==st::clockwise? -30 : 30);
         break;
-    case closeS:
+    case st::closeS:
         if (timeIntoState > 200) {
-            if (direction == st::clockwise) nextrobotstate = st::ccwfinish;
+            if (direction == st::clockwise) nextrobotstate = st::ccwFinish;
             else nextrobotstate = st::midS;
         }
-        if (direction == st::clockwise) {
-            avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 20, 30);
-        }
-        else {
-            avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 20, -30);
-        }
+        AVOID_WALLS(20, direction==st::clockwise? 30 : -30);
         break;
-    case ccwfinish:
-        if (timeIntoState > 2000) nextrobotstate = beforeButton;
-        avoidWalls(leftDist, rightDist, &jagspeed, &turnamt, 60, 0);
+    case st::ccwFinish:
+        if (timeIntoState > 2000) nextrobotstate = st::beforeButton;
+        AVOID_WALLS(60, 0);
         break;
     default:
         Serial.print("Undefined state: "); Serial.print(robotstate); Serial.print('\t');
