@@ -11,7 +11,7 @@
 char dummy;
 // Arduino puts all of its own malformed prototypes in here
 #endif
-#line 14 // Tell the compiler this is line 13 even though arduino adds some
+#line 14 // Tell the compiler this is line 14 even though arduino adds some
          // things before it
 
 // This may be changed to a fixed-point arithmetic class for speed and memory
@@ -29,7 +29,7 @@ void loop();
 
 CircleBot bot(1, 3, 4);
 #ifdef LEDARRAY
-LEDArray disp(9, 13, 10);
+LEDArray disp(9, 13, 10, 2);
 #endif
 
 #ifdef DEBUG
@@ -166,6 +166,9 @@ void updatemove(char x, char y) {
 
 void printProbs() {
     #if defined LEDARRAY || defined DEBUG
+    
+    DEBUG_VAR(digitalRead(2));
+    
     prob_t maximum = 0;
     for(size_t i=0; i<height; i++) {
         for(size_t j=0; j<width; j++) {
