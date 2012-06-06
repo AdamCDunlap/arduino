@@ -40,6 +40,8 @@ namespace st { // States for state machine
         redneck,
         findDirection,
         straightaway,
+        endofstraightaway,
+        recoverFromWall,
         uturn,
         farstraightaway,
         farS,
@@ -169,12 +171,13 @@ void loop() {
         turnamt = 0;
         break;
     case st::findDirection:
-        AVOID_WALLS(20, 0);
+        //AVOID_WALLS(20, 0);
+        jagspeed = 14;
         if (leftFeeler) {
-            nextrobotstate = st::closeS;
+            nextrobotstate = st::recoverFromWall;
             direction = st::counterclockwise;
         }
-        else if (timeIntoState > 2000) {
+        else if (timeIntoState > 3000) {
             nextrobotstate = st::straightaway;
             direction = st::clockwise;
         }
@@ -182,57 +185,78 @@ void loop() {
     case st::straightaway:
         if (direction == st::clockwise) {
             AVOID_WALLS(27, 0);
-            if (leftFeeler) nextrobotstate = st::uturn;
+            if (timeIntoState > 2500) nextrobotstate = st::endofstraightaway;
         }
         else {
             AVOID_WALLS(40, 0);
             if (timeIntoState > 15000) nextrobotstate = st::beforeButton;
         }
         break;
-    case st::uturn:
+    case st::endofstraightaway:
+        if (leftFeeler) nextrobotstate = st::recoverFromWall;
+        jagspeed = 17;
+        break;
+    case st::recoverFromWall:
         if (direction == st::clockwise) {
-            if (timeIntoState > 1000) nextrobotstate = st::farstraightaway;
-            jagspeed = 30;
-            turnamt = 80;
+            if (timeIntoState > 1500) nextrobotstate = st::uturn;
+            jagspeed = -20;
         }
         else {
-            if (timeIntoState > 1000) nextrobotstate = st::straightaway;
+            if (timeIntoState > 1500) nextrobotstate = st::closeS;
+            jagspeed = -20;
+        }
+        break;
+    case st::uturn:
+        if (direction == st::clockwise) {
+            if (timeIntoState > 3000) nextrobotstate = st::farstraightaway;
+            jagspeed = 30;
+            turnamt = 90;
+        }
+        else {
+            if (timeIntoState > 3000) nextrobotstate = st::straightaway;
             jagspeed = 30;
             turnamt = -80;
         }
         break;
     case st::farstraightaway:
-        if (timeIntoState > 200) {
-            if (direction == st::clockwise) nextrobotstate = st::farS;
-            else nextrobotstate = st::uturn;
+        if (direction == st::clockwise) {
+            if(timeIntoState > 500) {
+                nextrobotstate = st::farS;
+            }
+            AVOID_WALLS(30, -60);
         }
-        AVOID_WALLS(30, 0);
+        else {
+            if (timeIntoState > 500) {
+                nextrobotstate = st::uturn;
+            }
+            AVOID_WALLS(30, 0);
+        }
         break;
     case st::farS:
-        if (timeIntoState > 200) {
+        if (timeIntoState > 3000) {
             if (direction == st::clockwise) nextrobotstate = st::midS;
             else nextrobotstate = st::farstraightaway;
         }
 
-        AVOID_WALLS(20, direction==st::clockwise? 30 : -30);
+        AVOID_WALLS(30, direction==st::clockwise? -35 : 35);
         break;
     case st::midS:
-        if (timeIntoState > 200) {
+        if (timeIntoState > 3000) {
             if (direction == st::clockwise) nextrobotstate = st::closeS;
             else nextrobotstate = st::farS;
         }
-        AVOID_WALLS(20, direction==st::clockwise? -30 : 30);
+        AVOID_WALLS(30, direction==st::clockwise? 35 : -35);
         break;
     case st::closeS:
-        if (timeIntoState > 200) {
+        if (timeIntoState > 3000) {
             if (direction == st::clockwise) nextrobotstate = st::ccwFinish;
             else nextrobotstate = st::midS;
         }
-        AVOID_WALLS(20, direction==st::clockwise? 30 : -30);
+        AVOID_WALLS(30, direction==st::clockwise? -35 : 35);
         break;
     case st::ccwFinish:
-        if (timeIntoState > 2000) nextrobotstate = st::beforeButton;
-        AVOID_WALLS(60, 0);
+        if (timeIntoState > 7000) nextrobotstate = st::beforeButton;
+        AVOID_WALLS(30, 0);
         break;
     default:
         Serial.print("Undefined state: "); Serial.print(robotstate); Serial.print('\t');
