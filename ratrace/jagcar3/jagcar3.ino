@@ -28,7 +28,7 @@ const unsigned int rightDistThresh = 150;
 
 // Returns distance in cm
 byte readIR(const byte pin) {
-    return 1/(0.0000868056*(float)analogRead(pin)-0.00222222);
+    return 1/(0.0000868056*(float)analogRead(pin)-0.00222222);d
 }
 
 namespace st { // States for state machine
