@@ -10,12 +10,33 @@ bool wrapEdges = false;            // Whether to wrap like a torus
 
 byte defaultGrid[8];
 
-// These prototypes are not automatically created - bug in arduino software
+// Prototypes
 void serialWriteStartOfRow(byte rowNum);
 byte numNeighbors(byte* grid, byte row, byte column, bool wrap);
+void setup();
+void loop();
+bool checkSerial();
+bool changeDensity(char incoming);
+void ignoreNewline ();
+void serialWriteDead(byte row, byte column);
+void serialWriteAlive(byte row, byte column);
+void serialWriteStartOfBox();
+void serialWriteEndOfBox();
+void serialWriteEndOfRow();
+void generateRandomPattern(bool verbose);
 
-const __FlashStringHelper* options = reinterpret_cast <const __FlashStringHelper *>
-(
+
+void setup() {
+    Serial.begin(9600);
+    Serial.print(F(
+    "Welcome to Conway's Game of life!\n"
+    "We will start with a default pattern, but you can override that\n"
+    "by typing into the box above.\n"
+    "Make sure you set the line ending to \"Newline\"\n\n"
+    "The syntax is: 8 lines of 8 characters each\n"
+    "Representing each of the 8 rows and columns on the LED Matrix.\n"
+    "Each 0 represents a dead cell and anything else represents a "
+        "living cell.\n\n"
     "Sending 'c' cancels the current input.\n"
     "Sending 'h' displays this help.\n"
     "Sending 'd' displays the current input pattern on the matrix.\n"
@@ -26,22 +47,7 @@ const __FlashStringHelper* options = reinterpret_cast <const __FlashStringHelper
     "Sending 'R' cancels 'r'.\n"
     "Sending 'D=xx' (xx is a number) changes the density of the random "
         "pattern\n"
-);
-
-
-void setup() {
-    Serial.begin(9600);
-    Serial.print(F(
-        "Welcome to Conway's Game of life!\n"
-        "We will start with a default pattern, but you can override that\n"
-        "by typing into the box above.\n"
-        "Make sure you set the line ending to \"Newline\"\n\n"
-        "The syntax is: 8 lines of 8 characters each\n"
-        "Representing each of the 8 rows and columns on the LED Matrix.\n"
-        "Each 0 represents a dead cell and anything else represents a "
-            "living cell.\n\n"
-     ));
-    Serial.print(options);
+    ));
     randomSeed(analogRead(3));
 }
 
@@ -220,7 +226,8 @@ bool checkSerial() {
             break;
 
         case 'h':
-            Serial.println(); Serial.print(options);
+            //Serial.println(); Serial.print(options);
+            Serial.println(); Serial.print(F("Sorry, not implemented yet"));
             break;
 
         default:
