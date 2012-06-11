@@ -1,0 +1,14 @@
+# Classes
+Rover5Treads    KEYWORD1
+
+# Methods
+arcadeDrive     KEYWORD2
+tankDrive       KEYWORD2
+move            KEYWORD2
+stop            KEYWORD2
+idle            KEYWORD2
+
+# Constants
+minInVal        LITERAL1
+maxInVal        LITERAL1
+stopVal         LITERAL1
