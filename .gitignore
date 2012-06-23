@@ -2,3 +2,4 @@
 *~
 build-cli/
 Makefile
+tmp/
