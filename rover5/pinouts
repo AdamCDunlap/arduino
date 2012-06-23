@@ -1,0 +1,89 @@
+00 - serial
+01 - serial
+02 - encoderint1
+03 - encoderint2
+04 - encoderint3
+05 - mtr(pwm)1
+06 - mtr(pwm)2
+07 - encoder1
+08 - encoderint4
+09 - mtr(pwm)3
+10 - mtr(pwm)4
+11 - servo
+12 - encoder2
+13 - encoder3
+14 - encoder4
+15 - encoder5
+16 - encoder6
+17 - encoder7
+18 - encoder8
+19 - ultrasonic1
+20 - ultrasonic2
+
+
+        00 - serial
+        01 - serial
+        02 - encoder1A
+        03 - encoder1B
+        04 - encoder2A
+        05 - mtr1pwm
+        06 - mtr2pwm
+        07 - encoder2B
+        08 - encoder3A
+        09 - encoder3B
+        10 - mtr3pwm
+        11 - mtr4pwm
+        12 - mtr1dir
+        13 - mtr2dir
+a       14 - mtr3dir
+n       15 - mtr4dir
+a       16 - encoder4B
+l       17 - encoder4A
+o       18 - 
+g       19 - 
+
+
+
+arduino 1 -- encoder decoder and motor controller:
+        00 - serial
+        01 - serial
+        02 - encoder1A
+        03 - encoder1B
+        04 - encoder2A
+        05 - mtr1pwm
+        06 - mtr1dir
+        07 - encoder2B
+        08 - encoder3A
+        09 - mtr2pwm
+        10 - mtr3pwm
+        11 - mtr4pwm
+        12 - encoder3B
+        13 - mtr2dir
+a       14 - encoder4A
+n       15 - encoder4B
+a       16 - mtr3dir
+l       17 - mtr4dir
+o       18 - i2c communication
+g       19 - i2c
+
+arduino 2 -- logic:
+        00 - serial
+        01 - serial
+        02 - 
+        03 - 
+        04 - ultrasonic
+        05 - 
+        06 - 
+        07 - ultrasonic
+        08 - 
+        09 - turret servo
+        10 - 
+        11 - 
+        12 - 
+        13 - 
+a       14 - mtr1current
+n       15 - mtr2current
+a       16 - mtr3current
+l       17 - mtr4current
+o       18 - i2c
+g       19 - i2c
