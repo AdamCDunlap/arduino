@@ -33,6 +33,7 @@ struct Menu : public MenuOpt {
     MenuOpt** options; // Array of options
     virtual void select() {
         head = this;
+        showMenu();
     }
     Menu* prevMenu;
 };
@@ -52,8 +53,8 @@ struct FuncOpt : public MenuOpt {
 
 char getSelectChar(size_t i) {
     if (i<=10) return i+'0';
-    if (i<=36) return i+'a';
-    if (i<=62) return i+'A';
+    //if (i<=36) return i+'a';
+    //if (i<=62) return i+'A';
     else return '@';
 }
 
@@ -122,16 +123,25 @@ Menu mainmenu("Main", "Use your charger", 1, mainMenuOpts, NULL);
 int main() {
     init(); // Initialize the timers and stuff for arduino
 
-    head = &mainmenu;
-    
     Serial.begin(115200);
-    showMenu();
+
+    mainmenu.select();
 
     while(1) {
         if (Serial.available()) {
-            size_t opt = Serial.read() - '0'; // TODO: Make this work for a-z
-            head->options[opt]->select();
-            showMenu();
+            char c = Serial.read();
+            switch(c) {
+            case '0': case '1': case '2': case '3': case '4':
+            case '5': case '6': case '7': case '8': case '9':
+                head->options[c - '0']->select();
+                break;
+            case '?':
+                delay(10);
+                char c2 = Serial.read();
+                if(c2 >= '0' && c2 <= '9') Serial.println(head->options[c2-'0']->description);
+                else                       Serial.println(head->description);
+                break;
+            }
         }
     }
 }
