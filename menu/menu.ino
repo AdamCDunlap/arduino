@@ -128,6 +128,8 @@ int main() {
     mainmenu.select();
 
     while(1) {
+        
+        static bool waitingForSecondChar = false;
         if (Serial.available()) {
             char c = Serial.read();
             switch(c) {
@@ -136,11 +138,15 @@ int main() {
                 head->options[c - '0']->select();
                 break;
             case '?':
+            {
                 delay(10);
                 char c2 = Serial.read();
                 if(c2 >= '0' && c2 <= '9') Serial.println(head->options[c2-'0']->description);
                 else                       Serial.println(head->description);
                 break;
+            }
+            case 0x08: // backspace
+                head->prevMenu->select();
             }
         }
     }
