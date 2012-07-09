@@ -1,0 +1,43 @@
+arduino 1 -- encoder decoder and motor controller:
+        00 - serial
+        01 - serial
+        02 - encoder1A
+        03 - encoder1B
+        04 - encoder2A
+        05 - mtr1pwm
+        06 - mtr1dir
+        07 - encoder2B
+        08 - encoder3A
+        09 - mtr2pwm
+        10 - mtr3pwm
+        11 - mtr4pwm
+        12 - encoder3B
+        13 - mtr2dir
+a       14 - encoder4A
+n       15 - encoder4B
+a       16 - mtr3dir
+l       17 - mtr4dir
+o       18 - i2c communication
+g       19 - i2c
+
+arduino 2 -- logic:
+        00 - serial
+        01 - serial
+        02 - 
+        03 - 
+        04 - ultrasonic
+        05 - 
+        06 - 
+        07 - ultrasonic
+        08 - 
+        09 - turret servo
+        10 - 
+        11 - 
+        12 - 
+        13 - 
+a       14 - mtr1current
+n       15 - mtr2current
+a       16 - mtr3current
+l       17 - mtr4current
+o       18 - i2c
+g       19 - i2c

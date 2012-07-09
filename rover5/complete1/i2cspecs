@@ -1,0 +1,11 @@
+
+Jobs of interface arduino:
+Run motors
+Read encoders
+
+When a master requests data, the interface arduino will send back the encoder
+ values for each of the encoders in order: 1, 2, 3, then 4. Each value will
+ be two bytes LSB first, and there will be 8 bytes total
+When a master sends data, it must send a full 8 bytes, representing 4 integers
+ LSB first. Each integer must be -255 to 255 and correspond to the powers
+ of each of the four motors in order: 1, 2, 3, then 4.
