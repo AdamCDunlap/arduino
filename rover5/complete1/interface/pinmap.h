@@ -19,6 +19,17 @@ const uint8_t mtr4dirPin   = 17;
 const uint8_t i2cSDAPin    = 18;
 const uint8_t i2cSCLPin    = 19;
 
+const uint8_t mtrpwmPins[4] = {mtr1pwmPin, mtr2pwmPin, mtr3pwmPin, mtr4pwmPin};
+const uint8_t mtrdirPins[4] = {mtr1dirPin, mtr2dirPin, mtr3dirPin, mtr4dirPin};
+const uint8_t encoderAPins[4] = {encoder1APin, encoder2APin,
+                                 encoder3APin, encoder4APin};
+const uint8_t encoderBPins[4] = {encoder1BPin, encoder2BPin,
+                                 encoder3BPin, encoder4BPin};
+const uint8_t encoderPins[8] =  {encoder1APin, encoder1BPin,
+                                 encoder2APin, encoder2BPin,
+                                 encoder3APin, encoder3BPin,
+                                 encoder4APin, encoder4BPin};
+
 /* Notes:
  * If encoder pins change, change the code for reading pins in the interrupts
  */

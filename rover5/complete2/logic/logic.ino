@@ -27,10 +27,26 @@ g 19 - i2c                              | g 19 - i2c
 #include <Wire.h>
 #include <Servo.h>
 
+void sendNumber(int num) {
+    uint8_t* breakdown = reinterpret_cast<uint8_t *>(&num);
+    Wire.write(breakdown, 2);
+    Serial.println(*breakdown, BIN);
+    Serial.println(*(breakdown+1), BIN);
+}
+
 void setup() {
+    Serial.begin(115200);
+    Wire.begin();
 
 }
 
 void loop() {
+    Wire.beginTransmission(12);
+    sendNumber( 254);
+    sendNumber( 193);
+    sendNumber(-185);
+    sendNumber(-206);
+    Wire.endTransmission();
 
+    delay(2000);
 }
