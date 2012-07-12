@@ -44,8 +44,8 @@ void loop() {
     Wire.beginTransmission(12);
     sendNumber( 254);
     sendNumber( 193);
-    sendNumber(-185);
-    sendNumber(-206);
+    sendNumber( 185);
+    sendNumber( 206);
     Wire.endTransmission();
 
     delay(2000);
