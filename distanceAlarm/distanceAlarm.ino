@@ -5,9 +5,10 @@
 //volatile uint8_t& USddr  = DDRD;
 //volatile uint8_t  USbit  = _BV(4);
 #define DEBUG_PRINT(x) do {Serial.print(#x ": "); Serial.print(x); Serial.print('\t');} while(0)
-uint8_t  USpin = 4;
+uint8_t  USpin = A5;
 uint8_t vccPin = 5;
 uint8_t gndPin = 6;
+uint8_t speakerPin = 12;
 
 void setup();
 void loop();
@@ -15,6 +16,7 @@ void manageUltrasonic(const byte USpin, unsigned int* distance);
 
 void setup() {
     Serial.begin(115200);
+    pinMode(13, OUTPUT);
     pinMode(vccPin, OUTPUT);
     pinMode(gndPin, OUTPUT);
     digitalWrite(vccPin, HIGH);
@@ -33,17 +35,25 @@ void loop() {
 
     manageUltrasonic(USpin, &distance);
 
-    static unsigned long lastPrintTime = 0;
-    if (millis() - lastPrintTime >= 1000) {
-        //Serial.print("Time: ");   Serial.print(pulsetime); Serial.print('\t');
-        //Serial.print("Distance"); Serial.print(distance);  Serial.print('\t');
-        //DEBUG_PRINT(pulsetime);
-        DEBUG_PRINT(distance);
-        //DEBUG_PRINT(USstate);
-        DEBUG_PRINT(looptimeUs);
-        Serial.println();
+    //static unsigned long lastPrintTime = 0;
+    //if (millis() - lastPrintTime >= 500) {
+    //    //Serial.print("Time: ");   Serial.print(pulsetime); Serial.print('\t');
+    //    //Serial.print("Distance"); Serial.print(distance);  Serial.print('\t');
+    //    //DEBUG_PRINT(pulsetime);
+    //    DEBUG_PRINT(distance);
+    //    //DEBUG_PRINT(USstate);
+    //    DEBUG_PRINT(looptimeUs);
+    //    Serial.println();
 
-        lastPrintTime = millis();
+    //    lastPrintTime = millis();
+    //}
+    if (distance < 120) {
+        digitalWrite(13, HIGH);
+        tone(speakerPin, 800);
+    }
+    else {
+        digitalWrite(13, LOW);
+        noTone(speakerPin);
     }
 
     lastTimeUs = currentTimeUs;
