@@ -99,4 +99,5 @@ void i2cRequest() {
     Wire.write((uint8_t *)&encdists[1], 2);
     Wire.write((uint8_t *)&encdists[2], 2);
     Wire.write((uint8_t *)&encdists[3], 2);
+    //Wire.write((uint8_t *)encdists, 8);
 }

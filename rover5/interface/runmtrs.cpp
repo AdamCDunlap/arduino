@@ -7,6 +7,10 @@ volatile int receivedBytes;
 
 void runmtrs::setup() {
     Wire.onReceive(i2cReceive);
+    for (uint8_t i=0; i<4; i++) {
+        pinMode(mtrdirPins[i], OUTPUT);
+        pinMode(mtrpwmPins[i], OUTPUT);
+    }
 }
 
 void runmtrs::loop() {
@@ -42,7 +46,7 @@ void runmtrs::loop() {
                 analogWrite (mtrpwmPins[i], spd);
 
                 Serial.print(F("Mtr ")); Serial.print(i); Serial.print(F(": "));
-                Serial.write(dir? '-' : ' '); Serial.print(spd);
+                Serial.write(dir? '~' : ' '); Serial.print(spd);
                 Serial.println();
 
             }
