@@ -66,9 +66,9 @@ template<class T> void normalize4(T* a, T* b, T* c, T* d, T maximum) {
     T B = abs(*b);
     T C = abs(*c);
     T D = abs(*d);
-    T highest  = max(A, B);
-    T highest1 = max(C, D);
-       highest = max(highest, highest1);
+    T highest = max(A, B);
+      highest = max(highest, C);
+      highest = max(highest, D);
      
     // If all are below the max, we don't need to do anything
     if (highest <= maximum) return;
