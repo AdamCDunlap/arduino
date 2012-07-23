@@ -5,6 +5,8 @@ void i2cReceive(int numBytes);
 volatile bool receivedMessage = false;
 volatile int receivedBytes;
 
+int mtrspds[4];
+
 void runmtrs::setup() {
     Wire.onReceive(i2cReceive);
     for (uint8_t i=0; i<4; i++) {
@@ -45,14 +47,11 @@ void runmtrs::loop() {
                 digitalWrite(mtrdirPins[i], dir);
                 analogWrite (mtrpwmPins[i], spd);
 
-                Serial.print(F("Mtr ")); Serial.print(i); Serial.print(F(": "));
-                Serial.write(dir? '~' : ' '); Serial.print(spd);
-                Serial.println();
+                mtrspds[i] = dir? -(int)spd : (int) spd;
 
             }
         }
     }
-
 }
 
 // Interrupt, so must exit quickly
