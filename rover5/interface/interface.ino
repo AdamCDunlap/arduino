@@ -47,11 +47,11 @@ void loop() {
     static unsigned long lastPrintTime = 0;
     if (millis() - lastPrintTime > 200) {
         char buf[137];
-        sprintf(buf, "1spd:%4d 2spd:%4d 3spd:%4d 4spd:%4d\t"
-                     "1dst:%11ld 2dst:%11ld 3dst:%11ld 4dst:%11ld",
-                      mtrspds[0],mtrspds[1],mtrspds[2],mtrspds[3],
-                      encdists[0],encdists[1],encdists[2],encdists[3]);
-        Serial.println(buf);
+        sprintf(buf, "\r1spd:%4d 2spd:%4d 3spd:%4d 4spd:%4d\t"
+                       "1dst:%11ld 2dst:%11ld 3dst:%11ld 4dst:%11ld",
+                        mtrspds[0],mtrspds[1],mtrspds[2],mtrspds[3],
+                        encdists[0],encdists[1],encdists[2],encdists[3]);
+        Serial.print(buf);
     }
 
 }
