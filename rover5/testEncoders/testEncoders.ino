@@ -42,7 +42,7 @@ void loop() {
 
     static unsigned long lastSerialTime = 0;
     if (millis() - lastSerialTime > 200) {
-        char buf[120]; // Length optained by experimentation (strlen+1)
+        char buf[128]; // Length optained by experimentation (strlen+1)
 
         sprintf(buf, "xval:%4d yval:%4d "
         "FRspd:%4d FLspd:%4d BRspd:%4d BLspd:%4d "
