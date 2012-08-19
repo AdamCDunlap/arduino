@@ -3,3 +3,4 @@
 build-cli/
 Makefile
 tmp/
+*.mk
