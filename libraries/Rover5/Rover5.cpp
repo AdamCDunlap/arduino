@@ -7,6 +7,7 @@ Rover5::Rover5(uint8_t i2caddress) : interfaceAddress(i2caddress)
 
 void Rover5::begin() {
     Wire.begin();
+    Wire.requestFrom(interfaceAddress, (uint8_t)16);
 }
 
 
@@ -19,18 +20,18 @@ void Rover5::Run(int frontLeft, int frontRight, int backLeft, int backRight) {
     Run();
 }
 void Rover5::Run(int powers[4]) {
-    memcpy(Rover5::powers, powers, 4);
+    memcpy(Rover5::powers, powers, sizeof(Rover5::powers));
     Run();
 }
 void Rover5::Run(int x, int y, int z) {
-    powers[FL] = +y - x - z;
-    powers[FR] = +y + x + z;
-    powers[BL] = +y + x - z;
-    powers[BR] = +y - x + z;
+    powers[FL] = +y + x + z;
+    powers[FR] = +y - x - z;
+    powers[BL] = +y - x + z;
+    powers[BR] = +y + x - z;
 
     Normalize4(powers, 255);
 
-    Run(pows);
+    Run();
 }
 // Runs motors using values stored in powers array
 void Rover5::Run() {
@@ -46,21 +47,33 @@ void Rover5::Run() {
 }
 // Populates the powers array with the current speeds of each motor
 void Rover5::GetPowers(int powers[4]) {
-    memcpy(powers, Rover5::powers, 4);
+    memcpy(powers, Rover5::powers, sizeof(Rover5::powers));
 }
 
 // Populates the ticks array with the current number of encoder ticks for
 //  each motor
 void Rover5::GetTicks(long ticks[4]) {
     UpdateSpeeds();
-    memcpy(ticks, Rover5::ticks, 4);
+    memcpy(ticks, Rover5::ticks, sizeof(Rover5::ticks));
+
+    Serial.print('[');
+    Serial.print(ticks[0]);
+    for (uint8_t i=1; i<4; i++) {
+        Serial.print(",\t"); Serial.print(ticks[i]);
+    }
+    Serial.print("] = [");
+    Serial.print(Rover5::ticks[0]);
+    for (uint8_t i=1; i<4; i++) {
+        Serial.print(",\t"); Serial.print(Rover5::ticks[i]);
+    }
+    Serial.println(']');
 }
 
 // Populates the speeds array with the current speed of each motor in
 //  mills per second
 void Rover5::GetSpeeds(int speeds[4]) {
     UpdateSpeeds();
-    memcpy(speeds, Rover5::speeds, 4);
+    memcpy(speeds, Rover5::speeds, sizeof(Rover5::speeds));
 }
 
 // Read the current distances from the interface arduino and calculates
@@ -72,17 +85,16 @@ void Rover5::UpdateSpeeds() {
             ticksbreakdown[i] = Wire.read();
         }
         Wire.requestFrom(interfaceAddress, (uint8_t)16);
-        
-        for (uint8_t i=0; i<4; i++) {
-            TicksLog<10>* curlog = &tickLogs[i];
-            curlog.Put(ticks[i], millis());
-            
-            // TODO: Figure out factor and scale here
-            // XXX: nextpos-2 won't work; needs to wrap around
-            speeds[i] = 
-            ((curlog.ticks[curlog.nextPos-2] - curlog.ticks[curlog.nextPos-1]) /
-             (curlog.times[curlog.nextPos-2] - curlog.times[curlog.nextPos-1]));
-        }
+        //for (uint8_t i=0; i<4; i++) {
+        //    TicksLog<10>* curlog = &tickLogs[i];
+        //    curlog->Put(ticks[i], millis());
+        //    
+        //    // TODO: Figure out factor and scale here
+        //    // XXX: nextpos-2 won't work; needs to wrap around
+        //    speeds[i] = 
+        //    ((curlog->ticks[curlog->nextPos-2] - curlog->ticks[curlog->nextPos-1]) /
+        //     (curlog->times[curlog->nextPos-2] - curlog->times[curlog->nextPos-1]));
+        //}
     }
 }
 

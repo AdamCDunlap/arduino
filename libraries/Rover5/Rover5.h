@@ -48,9 +48,8 @@ private:
     template<uint8_t bufsz> struct TicksLog {
         long ticks[bufsz]; // Store last ten
         unsigned long times[bufsz];
-        uint8_t  oldestPos;
         uint8_t  newestPos;
-        uint8_t& nextPos = oldestPos; // oldest and next are the same
+        uint8_t nextPos;
 
         TicksLog() :nextPos(0) {}
         void Put(long ct, unsigned long nexttime) {
