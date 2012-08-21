@@ -10,12 +10,13 @@ public:
 
     void begin();
 
-    enum mtrNum { BR = 0, FR = 1, BL = 2, FL = 3 };
+    enum mtrNum_t { BR = 0, FR = 1, BL = 2, FL = 3 };
 
-    // Each speed is an int from -255 to 255
+    // Each power is an int from -255 to 255
     void Run(int frontLeft, int frontRight, int backLeft, int backRight);
     void Run(int powers[4]);
     void Run(int x, int y, int z = 0);
+    void Run(int power, mtrNum_t num);
 
     // Populates the powers array with the current speeds of each motor
     void GetPowers(int powers[4]);
@@ -30,7 +31,9 @@ public:
     
     // Read the current distances from the interface arduino and calculates
     //  the speeds
-    void UpdateSpeeds();
+    // Returns true if speeds were updated or false if nothing was received
+    //  over i2c yet
+    bool UpdateSpeeds();
     
     // Sets the current i2c address
     void SetI2CAddress(uint8_t address) { interfaceAddress = address; }
@@ -45,20 +48,23 @@ private:
     int powers[4];
 
     // Circular buffer class holding the last ten tick counts and times
-    template<uint8_t bufsz> struct TicksLog {
-        long ticks[bufsz]; // Store last ten
+    template <size_t bufsz> struct TickLogs {
+        long ticks[bufsz][4];
         unsigned long times[bufsz];
-        uint8_t  newestPos;
-        uint8_t nextPos;
+        uint8_t nextEntry;
 
-        TicksLog() :nextPos(0) {}
-        void Put(long ct, unsigned long nexttime) {
-            nextPos = (nextPos >= bufsz-1)? 0 : nextPos+1;
-            ticks[nextPos] = ct;
-            times[nextPos] = nexttime;
+        TickLogs() : nextEntry(0) {}
+
+        void Put(long iticks[4], unsigned long time) {
+            memcpy(ticks[nextEntry], iticks, sizeof(ticks[0]));
+            times[nextEntry] = time;
+
+            nextEntry = (nextEntry >= bufsz-1)? 0 : nextEntry+1;
         }
     };
-    TicksLog<10> tickLogs[4];
+
+    static const size_t spdLogLen = 10;
+    TickLogs<spdLogLen> tickLogs;
 
     // Scales array down to be under maximum but the same relative to
     //  each other

@@ -1,6 +1,7 @@
 #include <Rover5.h>
 
-Rover5::Rover5(uint8_t i2caddress) : interfaceAddress(i2caddress)
+Rover5::Rover5(uint8_t i2caddress)
+    : interfaceAddress(i2caddress)
     {
 
 }
@@ -8,6 +9,10 @@ Rover5::Rover5(uint8_t i2caddress) : interfaceAddress(i2caddress)
 void Rover5::begin() {
     Wire.begin();
     Wire.requestFrom(interfaceAddress, (uint8_t)16);
+
+    for (size_t i=0; i<spdLogLen; i++) {
+        while(!UpdateSpeeds());
+    }
 }
 
 
@@ -33,6 +38,12 @@ void Rover5::Run(int x, int y, int z) {
 
     Run();
 }
+
+void Rover5::Run(int power, mtrNum_t num) {
+    powers[num] = power;
+    Run();
+}
+
 // Runs motors using values stored in powers array
 void Rover5::Run() {
     powers[BR] *= -1;
@@ -76,29 +87,81 @@ void Rover5::GetSpeeds(int speeds[4]) {
     memcpy(speeds, Rover5::speeds, sizeof(Rover5::speeds));
 }
 
+// This version is async but the i2c library is not -- also, it fails if
+//  other arduino is disconnected
+//// Read the current distances from the interface arduino and calculates
+////  the speeds
+//bool Rover5::UpdateSpeeds() {
+//    if (Wire.available() >= 16) {
+//        uint8_t* ticksbreakdown = (uint8_t*)ticks;
+//        for (uint8_t i=0; i<16; i++) {
+//            ticksbreakdown[i] = Wire.read();
+//        }
+//        Wire.requestFrom(interfaceAddress, (uint8_t)16);
+//
+//        unsigned long curTime = micros();
+//
+//        unsigned long timesDiff = curTime - tickLogs.times[tickLogs.nextEntry];
+//        for (uint8_t i=0; i<4; i++) {
+//            // Difference in ticks from oldest entry to entry about to be put in
+//            //  over difference in the times over the same
+//            long ticksDiff =  ticks[i] - tickLogs.ticks[tickLogs.nextEntry][i];
+//            speeds[i] = 10000000.0 * (float)ticksDiff / (float)timesDiff;
+//            //Serial.print(F("ck: ")); Serial.print(ticksDiff); Serial.print('\t');
+//            //Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print('\t');
+//        }
+//        tickLogs.Put(ticks, curTime);
+//
+//        Serial.println(F("Bytes availalbe"));
+//        return true;
+//    }
+//    Serial.println(F("Bytes not available"));
+//    return false;
+//}
+
+
 // Read the current distances from the interface arduino and calculates
 //  the speeds
-void Rover5::UpdateSpeeds() {
-    if (Wire.available() >= 16) {
-        uint8_t* ticksbreakdown = (uint8_t*)ticks;
-        for (uint8_t i=0; i<16; i++) {
-            ticksbreakdown[i] = Wire.read();
-        }
+bool Rover5::UpdateSpeeds() {
+
+    {
+        unsigned long endtime;
+        unsigned long starttime;
+        starttime = micros();
         Wire.requestFrom(interfaceAddress, (uint8_t)16);
-        //for (uint8_t i=0; i<4; i++) {
-        //    TicksLog<10>* curlog = &tickLogs[i];
-        //    curlog->Put(ticks[i], millis());
-        //    
-        //    // TODO: Figure out factor and scale here
-        //    // XXX: nextpos-2 won't work; needs to wrap around
-        //    speeds[i] = 
-        //    ((curlog->ticks[curlog->nextPos-2] - curlog->ticks[curlog->nextPos-1]) /
-        //     (curlog->times[curlog->nextPos-2] - curlog->times[curlog->nextPos-1]));
-        //}
+        endtime = micros();
+        Serial.print(F("requestFrom time: ")); Serial.print(endtime - starttime); Serial.print(' ');
+
     }
+
+    if (Wire.available() < 16) { 
+        Serial.println(F("Bytes not avilable"));
+        return false;
+    }
+
+    uint8_t* ticksbreakdown = (uint8_t*)ticks;
+    for (uint8_t i=0; i<16; i++) {
+        ticksbreakdown[i] = Wire.read();
+    }
+
+    unsigned long curTime = micros();
+
+    unsigned long timesDiff = curTime - tickLogs.times[tickLogs.nextEntry];
+    Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print(' ');
+    for (uint8_t i=0; i<4; i++) {
+        // Difference in ticks from oldest entry to entry about to be put in
+        //  over difference in the times over the same
+        long ticksDiff =  ticks[i] - tickLogs.ticks[tickLogs.nextEntry][i];
+        const float factor = 37699112.0;
+        speeds[i] = (int)(factor * (float)ticksDiff / (float)timesDiff);
+        Serial.print(F("ck")); Serial.print(i); Serial.print(F(": ")); Serial.print(ticksDiff); Serial.print(' ');
+        //Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print('\t');
+    }
+    tickLogs.Put(ticks, curTime);
+    Serial.print('|');
+
+    return true;
 }
-
-
 
 void Rover5::Normalize4(int nums[4], int maximum) {
     int highest = abs(nums[1]);
