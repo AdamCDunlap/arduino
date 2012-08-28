@@ -16,30 +16,15 @@ static int serial_getchar(FILE*) {
 
 static FILE serial_stdinout;
 
-//void setup_stdin_stdout() __attribute__ ((section (".init8")));
-
-void setup_stdin_stdout() {
+static void setup_stdin_stdout() {
     
     // Set up stdout and stdin
-    //fdev_setup_stream(stdout, serial_putchar, serial_getchar, _FDEV_SETUP_RW);
-    //stdin = stderr = stdout;
-
 
     fdev_setup_stream(&serial_stdinout, serial_putchar, serial_getchar, _FDEV_SETUP_RW);
     stdout = &serial_stdinout;
     stdin  = &serial_stdinout;
     stderr = &serial_stdinout;
 }
-
-//struct blah {
-//    blah(int ii) : i(ii) {
-//        setup_stdin_stdout();
-//    }
-//    volatile int i;
-//};
-//
-//static blah myblah(12);
-
 
 size_t initializeSTDINOUT::initnum = 0;
 initializeSTDINOUT::initializeSTDINOUT() {
