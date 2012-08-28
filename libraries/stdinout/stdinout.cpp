@@ -26,7 +26,10 @@ static void setup_stdin_stdout() {
     stderr = &serial_stdinout;
 }
 
+// Initialize the static variable to 0
 size_t initializeSTDINOUT::initnum = 0;
+
+// Constructor that calls the function to set up stdin and stdout
 initializeSTDINOUT::initializeSTDINOUT() {
     if (initnum++ == 0) {
         setup_stdin_stdout();
