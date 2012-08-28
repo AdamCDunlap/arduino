@@ -8,7 +8,7 @@ Rover5::Rover5(uint8_t i2caddress)
 
 void Rover5::begin() {
     Wire.begin();
-    Wire.requestFrom(interfaceAddress, (uint8_t)16);
+    //Wire.requestFrom(interfaceAddress, (uint8_t)16);
 
     for (size_t i=0; i<spdLogLen; i++) {
         while(!UpdateSpeeds());
@@ -35,6 +35,13 @@ void Rover5::Run(int x, int y, int z) {
     powers[BR] = +y + x - z;
 
     Normalize4(powers, 255);
+
+    // If power is less than 30, the motor won't move
+    for (uint8_t i=0; i<4; i++) {
+        if (powers[i] > -30 && powers[i] < 30) {
+            powers[i] = 0;
+        }
+    }
 
     Run();
 }
@@ -67,17 +74,17 @@ void Rover5::GetTicks(long ticks[4]) {
     UpdateSpeeds();
     memcpy(ticks, Rover5::ticks, sizeof(Rover5::ticks));
 
-    Serial.print('[');
-    Serial.print(ticks[0]);
-    for (uint8_t i=1; i<4; i++) {
-        Serial.print(",\t"); Serial.print(ticks[i]);
-    }
-    Serial.print("] = [");
-    Serial.print(Rover5::ticks[0]);
-    for (uint8_t i=1; i<4; i++) {
-        Serial.print(",\t"); Serial.print(Rover5::ticks[i]);
-    }
-    Serial.println(']');
+    //Serial.print('[');
+    //Serial.print(ticks[0]);
+    //for (uint8_t i=1; i<4; i++) {
+    //    Serial.print(",\t"); Serial.print(ticks[i]);
+    //}
+    //Serial.print("] = [");
+    //Serial.print(Rover5::ticks[0]);
+    //for (uint8_t i=1; i<4; i++) {
+    //    Serial.print(",\t"); Serial.print(Rover5::ticks[i]);
+    //}
+    //Serial.println(']');
 }
 
 // Populates the speeds array with the current speed of each motor in
@@ -125,17 +132,17 @@ void Rover5::GetSpeeds(int speeds[4]) {
 bool Rover5::UpdateSpeeds() {
 
     {
-        unsigned long endtime;
-        unsigned long starttime;
-        starttime = micros();
+        //unsigned long endtime;
+        //unsigned long starttime;
+        //starttime = micros();
         Wire.requestFrom(interfaceAddress, (uint8_t)16);
-        endtime = micros();
-        Serial.print(F("requestFrom time: ")); Serial.print(endtime - starttime); Serial.print(' ');
+        //endtime = micros();
+        //Serial.print(F("requestFrom time: ")); Serial.print(endtime - starttime); Serial.print(' ');
 
     }
 
     if (Wire.available() < 16) { 
-        Serial.println(F("Bytes not avilable"));
+        //Serial.println(F("Bytes not avilable"));
         return false;
     }
 
@@ -143,22 +150,24 @@ bool Rover5::UpdateSpeeds() {
     for (uint8_t i=0; i<16; i++) {
         ticksbreakdown[i] = Wire.read();
     }
+    ticks[FR] *= -1;
+    ticks[FL] *= -1;
 
     unsigned long curTime = micros();
 
     unsigned long timesDiff = curTime - tickLogs.times[tickLogs.nextEntry];
-    Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print(' ');
+    //Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print(' ');
     for (uint8_t i=0; i<4; i++) {
         // Difference in ticks from oldest entry to entry about to be put in
         //  over difference in the times over the same
         long ticksDiff =  ticks[i] - tickLogs.ticks[tickLogs.nextEntry][i];
         const float factor = 37699112.0;
         speeds[i] = (int)(factor * (float)ticksDiff / (float)timesDiff);
-        Serial.print(F("ck")); Serial.print(i); Serial.print(F(": ")); Serial.print(ticksDiff); Serial.print(' ');
+        //Serial.print(F("ck")); Serial.print(i); Serial.print(F(": ")); Serial.print(ticksDiff); Serial.print(' ');
         //Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print('\t');
     }
     tickLogs.Put(ticks, curTime);
-    Serial.print('|');
+    //Serial.print('|');
 
     return true;
 }
