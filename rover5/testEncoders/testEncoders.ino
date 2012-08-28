@@ -1,5 +1,4 @@
 #include <Wire.h>
-#include <Servo.h>
 
 void moveMotors(int spds[4]);
 void getEncoders(long dists[4]);
