@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <Arduino.h>
-#include <STDINOUT.h>
+#include <stdinout.h>
 
 // Function that printf and related will use to print
 static int serial_putchar(char c, FILE* f) {
