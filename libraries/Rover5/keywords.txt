@@ -7,6 +7,8 @@ GetTicks        KEYWORD2
 GetSpeeds       KEYWORD2
 UpdateSpeeds    KEYWORD2
 SetI2CAddress   KEYWORD2
+GetDists        KEYWORD2
+GetDist         KEYWORD2
 
 BR              LITERAL1
 FR              LITERAL1

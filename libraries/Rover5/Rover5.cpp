@@ -36,11 +36,18 @@ void Rover5::Run(int x, int y, int z) {
 
     Normalize4(powers, 255);
 
-    // If power is less than 30, the motor won't move
+    // map {-255,255} to {-255,-25}, {0}, and {25,255}
     for (uint8_t i=0; i<4; i++) {
-        if (powers[i] > -30 && powers[i] < 30) {
-            powers[i] = 0;
+        if (powers[i] < 0) {
+            // Cast to unsigned for the multiplication and division,
+            //  but then cast back before the subtraction
+            powers[i] = (int)(((unsigned int)(powers[i] + 255) *
+                               (unsigned int)(255-minPower)) / 255) - 255;
+        } else if (powers[i] > 0) {
+            powers[i] = (int)(((unsigned int)powers[i] *
+                               (unsigned int)(255-minPower)) / 255) + minPower;
         }
+        // If it's 0, keep it 0
     }
 
     Run();
