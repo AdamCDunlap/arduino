@@ -19,7 +19,6 @@ public:
 
    /**
     * @brief Sets up class.
-    *
     * This should be called after init() (ie. in setup()).
     */
     void begin();
@@ -27,7 +26,6 @@ public:
 
    /**
     * @brief Run motors directly.
-    *
     * @param frontLeft  The power, from -255 to 255, of the front left motor.
     * @param frontRight The power, from -255 to 255, of the front right motor.
     * @param backLeft   The power, from -255 to 255, of the back left motor.
@@ -36,13 +34,11 @@ public:
     void Run(int frontLeft, int frontRight, int backLeft, int backRight);
    /**
     * @brief Run motors directly.
-    *
     * @param powers An array of powers, from -255 to 255 for each motor..
     */
     void Run(int powers[4]);
    /**
     * @brief Run the robot in a direction.
-    *
     * This should be the main movement function used by a programmer.
     * Note that there is scaling in this function (and this function only)
     *  so that even a power of 1 will move the robot, so there is no deadband
@@ -53,7 +49,6 @@ public:
     void Run(int x, int y, int z = 0);
    /**
     * @brief Run one motor.
-    *
     * @param power The power to move the motor.
     * @param num   The motor to run.
     */
@@ -61,7 +56,6 @@ public:
 
    /**
     * @brief Gets the most recently specified powers for each motor.
-    *
     * This function populates the powers array with the most recently specified
     * powers for each motor.
     * @param powers The array to put the powers into.
@@ -70,7 +64,6 @@ public:
 
    /**
     * @brief Gets the current encoder counts for each motor.
-    *
     * This function populates the ticks array with the current encoder counts
     * for each motor.
     * In addition to getting the current encoder counts, this function also
@@ -82,7 +75,6 @@ public:
 
    /**
     * @brief Gets the current speeds for each motor.
-    *
     * This function populates the speeds array with the current speeds in
     * milliinches (mills) per second for each motor.
     * In addition to getting the current speeds, this function also
@@ -93,7 +85,6 @@ public:
     
    /**
     * @brief Update the internal speeds array.
-    *
     * Call this function iff the code will not be calling GetTicks or GetSpeeds
     * for a while, but you will want to read the speeds eventually.
     * @return whether or not speeds were updated (ie no problems).
@@ -102,7 +93,6 @@ public:
     
    /**
     * @brief Gets the current distances for each motor.
-    *
     * This function populates the dists array with the current scaled encoder
     * counts for each motor, in milliinches (mills).
     * In addition to getting the current encoder counts, this function also
@@ -113,26 +103,6 @@ public:
 
    /**
     * @brief Gets the current distance the robot has gone.
-    *
-    * In addition to getting the current encoder counts, this function also
-    * updates the interal timelock of ticks used to calculate motor speed.
-    * @return The forward distance the robot has gone in mills
-    */
-    long GetDist();
-   /**
-    * @brief Gets the current distance the robot has gone.
-    *
-    * In addition to getting the current encoder counts, this function also
-    * updates the interal timelock of ticks used to calculate motor speed.
-    * @param xdist The variable to store the lateral distance the robot has
-    *              gone in mills.
-    * @param ydist The variable to store the forward distance the robot has
-    *              gone in mills.
-    */
-    void GetDist(long* xdist, long* ydist);
-   /**
-    * @brief Gets the current distance the robot has gone.
-    *
     * In addition to getting the current encoder counts, this function also
     * updates the interal timelock of ticks used to calculate motor speed.
     * @param xdist The variable to store the lateral distance the robot has
@@ -142,11 +112,9 @@ public:
     * @param angle The variable to store the current angle of the robot in
     *              milliradians
     */
-    void GetDist(long* xdist, long* ydist, unsigned int* angle);
+    long GetDist(long* xdist = NULL, long* ydist = NULL,
+                 unsigned int* angle = NULL);
 
-    /**
-    * @brief Sets the i2c address of the interface arduino
-    */
     void SetI2CAddress(uint8_t address) { interfaceAddress = address; }
 
    /**
@@ -157,13 +125,6 @@ public:
 private:
     /// Minimum power for a motor to move
     static const int minPower = 25;
-    /// The radius of the wheels in mills
-    static const int wheelRadius = 2000;
-
-    /// Factor to multiple ticks by to get mills
-    // 2 pi * radius = circumference
-    // there are 3 rotations of the wheel per 1000 ticks [rover5 manual]
-    static const double ticksToMills = (TWO_PI * wheelRadius * 3.0)/1000.0;
 
     /// i2c Address of the interface arduino
     uint8_t interfaceAddress;

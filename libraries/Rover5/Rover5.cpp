@@ -80,6 +80,18 @@ void Rover5::GetPowers(int powers[4]) {
 void Rover5::GetTicks(long ticks[4]) {
     UpdateSpeeds();
     memcpy(ticks, Rover5::ticks, sizeof(Rover5::ticks));
+
+    //Serial.print('[');
+    //Serial.print(ticks[0]);
+    //for (uint8_t i=1; i<4; i++) {
+    //    Serial.print(",\t"); Serial.print(ticks[i]);
+    //}
+    //Serial.print("] = [");
+    //Serial.print(Rover5::ticks[0]);
+    //for (uint8_t i=1; i<4; i++) {
+    //    Serial.print(",\t"); Serial.print(Rover5::ticks[i]);
+    //}
+    //Serial.println(']');
 }
 
 // Populates the speeds array with the current speed of each motor in
@@ -89,36 +101,38 @@ void Rover5::GetSpeeds(int speeds[4]) {
     memcpy(speeds, Rover5::speeds, sizeof(Rover5::speeds));
 }
 
-void Rover5::GetDists(long dists[4]) {
-    UpdateSpeeds();
-    for (uint8_t i=0; i<4; i++) {
-        dist[i] = ticks[i] * ticksToMills;
-    }
-}
+// This version is async but the i2c library is not -- also, it fails if
+//  other arduino is disconnected
+//// Read the current distances from the interface arduino and calculates
+////  the speeds
+//bool Rover5::UpdateSpeeds() {
+//    if (Wire.available() >= 16) {
+//        uint8_t* ticksbreakdown = (uint8_t*)ticks;
+//        for (uint8_t i=0; i<16; i++) {
+//            ticksbreakdown[i] = Wire.read();
+//        }
+//        Wire.requestFrom(interfaceAddress, (uint8_t)16);
+//
+//        unsigned long curTime = micros();
+//
+//        unsigned long timesDiff = curTime - tickLogs.times[tickLogs.nextEntry];
+//        for (uint8_t i=0; i<4; i++) {
+//            // Difference in ticks from oldest entry to entry about to be put in
+//            //  over difference in the times over the same
+//            long ticksDiff =  ticks[i] - tickLogs.ticks[tickLogs.nextEntry][i];
+//            speeds[i] = 10000000.0 * (float)ticksDiff / (float)timesDiff;
+//            //Serial.print(F("ck: ")); Serial.print(ticksDiff); Serial.print('\t');
+//            //Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print('\t');
+//        }
+//        tickLogs.Put(ticks, curTime);
+//
+//        Serial.println(F("Bytes availalbe"));
+//        return true;
+//    }
+//    Serial.println(F("Bytes not available"));
+//    return false;
+//}
 
-long Rover5::GetDist() {
-    UpdateSpeeds();
-    long yticks = 0;
-    for (uint8_t i=0; i<4; i++) {
-        yticks += (ticks[i]/4);
-    }
-    return yticks * ticksToMills;
-}
-
-void Rover5::GetDist(long* xdist, long* ydist) {
-    UpdateSpeeds();
-    long yticks = +ticks[FL]/4 +ticks[FR]/4 +ticks[BL]/4 +ticks[BR]/4;
-    long xticks = +ticks[FL]/4 -ticks[FR]/4 -ticks[BL]/4 +ticks[BR]/4;
-
-    *xdist = xticks * ticksToMills;
-    *ydist = xticks * ticksToMills;
-}
-
-void Rover5::GetDist(long* xdist, long* ydist, long* rotation) {
-    GetDist(xdist, ydist); // This calls updatespeeds
-    
-    long rotationTicks = +ticks[FL]/4 -ticks[FR]/4 +ticks[BL]/4 -ticks[BR]/4;
-}
 
 // Read the current distances from the interface arduino and calculates
 //  the speeds
@@ -130,9 +144,7 @@ bool Rover5::UpdateSpeeds() {
         //starttime = micros();
         Wire.requestFrom(interfaceAddress, (uint8_t)16);
         //endtime = micros();
-        //Serial.print(F("requestFrom time: "));
-        //Serial.print(endtime - starttime);
-        //Serial.print(' ');
+        //Serial.print(F("requestFrom time: ")); Serial.print(endtime - starttime); Serial.print(' ');
 
     }
 
