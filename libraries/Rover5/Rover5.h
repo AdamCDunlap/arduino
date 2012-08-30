@@ -6,6 +6,7 @@
 
 /**
  * @brief A class to control our Rover5 robot platform.
+ *
  * This class could theoretically control any four wheeled robot with
  * mecanum wheels and encoders on each one with an interface arduino
  * that communicates with a protocol defined in the protocol file
