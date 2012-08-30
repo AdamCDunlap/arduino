@@ -4,3 +4,4 @@ build-cli/
 Makefile
 tmp/
 *.mk
+doc/
