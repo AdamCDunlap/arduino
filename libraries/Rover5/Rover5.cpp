@@ -92,7 +92,7 @@ void Rover5::GetSpeeds(int speeds[4]) {
 void Rover5::GetDists(long dists[4]) {
     UpdateSpeeds();
     for (uint8_t i=0; i<4; i++) {
-        dist[i] = ticks[i] * ticksToMills;
+        dists[i] = ticks[i] * ticksToMills;
     }
 }
 
@@ -111,13 +111,14 @@ void Rover5::GetDist(long* xdist, long* ydist) {
     long xticks = +ticks[FL]/4 -ticks[FR]/4 -ticks[BL]/4 +ticks[BR]/4;
 
     *xdist = xticks * ticksToMills;
-    *ydist = xticks * ticksToMills;
+    *ydist = yticks * ticksToMills;
 }
 
-void Rover5::GetDist(long* xdist, long* ydist, long* rotation) {
+void Rover5::GetDist(long* xdist, long* ydist, unsigned int* angle) {
     GetDist(xdist, ydist); // This calls updatespeeds
     
     long rotationTicks = +ticks[FL]/4 -ticks[FR]/4 +ticks[BL]/4 -ticks[BR]/4;
+    *angle = rotationTicks; // XXX: This doesn't work
 }
 
 // Read the current distances from the interface arduino and calculates
@@ -168,9 +169,9 @@ bool Rover5::UpdateSpeeds() {
 }
 
 void Rover5::Normalize4(int nums[4], int maximum) {
-    int highest = abs(nums[1]);
+    int highest = abs(nums[0]);
     for (uint8_t i=1; i<4; i++) {
-        int tmp = abs(i);
+        int tmp = abs(nums[i]);
         if(tmp > highest) highest = tmp;
     }
 

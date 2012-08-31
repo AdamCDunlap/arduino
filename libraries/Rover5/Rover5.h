@@ -14,6 +14,12 @@
 class Rover5 {
 public:
    /**
+    * Constants used to specify which motor to use or to index any array of
+    * motors in this class
+    */
+    enum mtrNum_t { BR = 0, FR = 1, BL = 2, FL = 3 };
+
+   /**
     * @param i2caddress The i2c address of the interface arduino.
     */
     Rover5(uint8_t i2caddress = 12);
@@ -150,11 +156,6 @@ public:
     */
     void SetI2CAddress(uint8_t address) { interfaceAddress = address; }
 
-   /**
-    * Constants used to specify which motor to use or to index any array of
-    * motors in this class
-    */
-    enum mtrNum_t { BR = 0, FR = 1, BL = 2, FL = 3 };
 private:
     /// Minimum power for a motor to move
     static const int minPower = 25;
