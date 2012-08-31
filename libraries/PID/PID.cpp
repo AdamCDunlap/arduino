@@ -1,13 +1,13 @@
 #include <PID.h>
 
 // Constructor -- optionally takes gains
-PID::PID(internal_t outMin, internal_t outMax, gain_t inP, gain_t inI, gain_t inD)
-    : kP(inP), kI(inI), kD(inD)
-    , errorSum(0)
-    , lastError(0)
-    , outputMin(outMin)
-    , outputMax(outMax)
+PID::PID(bool isInverted, internal_t outMin, internal_t outMax, gain_t inP, gain_t inI, gain_t inD)
+    : errorSum(0)
+    , lastInput(0)
     {
+    SetInverted(isInverted);
+    SetMinMax(outMin, outMax);
+    SetPID(inP, inI, inD);
 }
 
 // The main method to call 
@@ -15,26 +15,19 @@ PID::PID(internal_t outMin, internal_t outMax, gain_t inP, gain_t inI, gain_t in
 internal_t PID::GetOutput(internal_t cur, internal_t setpoint, unsigned long time) {
     internal_t error = setpoint - cur;
 
-    printf_P(PSTR("PID ErrSum: %0f "), errorSum);
     
     internal_t Pval = kP * error;
-    internal_t Dval = kD * ((error - lastError) / (time - lasttime));
+    internal_t Dval = kD * ((lastInput - cur) / (time - lasttime));
 
+    printf_P(PSTR("ErrSum: %.2f Timediff: %lu  Inputdiff: %2.0f "), errorSum, time - lasttime, lastInput - cur);
 
-    internal_t Ival;
     errorSum += kI * error * (time - lasttime);
-    if (errorSum > outputMax) {
-        errorSum = outputMax;
-        Ival = outputMax;
-    } else if (errorSum < outputMin) {
-        errorSum = outputMin;
-        Ival = outputMin;
-    } else {
-        Ival = kI * errorSum;
-    }
+         if (errorSum > outputMax) errorSum = outputMax;
+    else if (errorSum < outputMin) errorSum = outputMin;
+    internal_t Ival = errorSum;
 
     lasttime = time;
-    lastError = error;
+    lastInput = cur;
 
     internal_t output = Pval + Ival + Dval;
     return (output > outputMax)? outputMax : ((output < outputMin)? outputMin : output);
@@ -42,12 +35,28 @@ internal_t PID::GetOutput(internal_t cur, internal_t setpoint, unsigned long tim
 
 // Sets the PID gains
 void PID::SetPID(gain_t inP, gain_t inI, gain_t inD) {
-    kP = inP;
-    kI = inI;
-    kD = inD;
+    if (inP<0 || inI <0 || inD<0) return;
+    if (inverted) {
+        kP = -inP;
+        kI = -inI;
+        kD = -inD;
+    } else {
+        kP = +inP;
+        kI = +inI;
+        kD = +inD;
+    }
 }
 
 void PID::SetMinMax(internal_t outMin, internal_t outMax) {
     outputMin = outMin;
     outputMax = outMax;
+}
+
+void PID::SetInverted(bool isInverted) {
+    inverted = isInverted;
+    if (isInverted) {
+        kP *= -1;
+        kI *= -1;
+        kD *= -1;
+    }
 }

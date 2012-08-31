@@ -4,7 +4,9 @@
 #include <Wire.h>
 
 Rover5 bot;
-PID botPID(-255, 255);
+PID botPID(false, -255, 255);
+
+long offset;
 
 void setup() {
     Serial.begin(115200);
@@ -12,6 +14,11 @@ void setup() {
     bot.begin();
 
     Serial.println(F("Bot began"));
+
+    long encoderDists[4];
+    
+    bot.GetTicks(encoderDists);
+    offset = encoderDists[Rover5::FL];
 }
 
 void loop() {
@@ -20,7 +27,7 @@ void loop() {
     // 1.48,0,0 is highest value for almost no reverse
     static float P = 1.48, I = 0, D = 0;
 
-    static long setpoint = 100;
+    static long setpoint = 0;
 
     if (Serial.available()) { // User started typing something
         if        (Serial.peek() == 'p') {
@@ -54,9 +61,10 @@ void loop() {
     long encoderDists[4];
     
     bot.GetTicks(encoderDists);
-    int wheelspd = botPID.GetOutput(encoderDists[Rover5::FL], setpoint, micros());
+    int wheelspd = botPID.GetOutput(encoderDists[Rover5::FL]-offset, setpoint, micros());
     bot.Run(0, wheelspd);
     
-    printf_P(PSTR("\rP:%2f I:%2f D:%2f curdist:%6ld setpoint:%6ld curspd:%4d "),
-                   P, I, D, encoderDists[Rover5::FL], setpoint, wheelspd);
+    printf_P(PSTR("P:%2f I:%2f D:%2f curdist:%6ld setpoint:%6ld curspd:%4d\n"),
+                   P, I, D, encoderDists[Rover5::FL]-offset, setpoint, wheelspd);
+    delay(50);
 }

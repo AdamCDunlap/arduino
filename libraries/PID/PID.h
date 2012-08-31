@@ -8,8 +8,10 @@ typedef double gain_t;
 typedef double internal_t;
 class PID {
 public:
-    // Constructor -- optionally takes gains
-    PID(internal_t outMin=-INFINITY, internal_t outMax=INFINITY, gain_t inP=0, gain_t inI=0, gain_t inD=0);
+    // Constructor -- optionally takes gains and bounds
+    PID(bool isInverted = false,
+        internal_t outMin=-INFINITY, internal_t outMax=INFINITY,
+        gain_t inP=0, gain_t inI=0, gain_t inD=0);
 
     // The main method to call 
     // Takes the sensor value and it returns the power
@@ -19,12 +21,16 @@ public:
     void SetPID(gain_t inP, gain_t inI, gain_t inD);
 
     void SetMinMax(internal_t outMin, internal_t outMax);
+
+    // Set to true if setting the output positive makes the input decrease
+    void SetInverted(bool isInverted);
 private:
     gain_t kP, kI, kD;
+    bool inverted;
 
     internal_t errorSum;
     
-    internal_t lastError;
+    internal_t lastInput;
 
     internal_t outputMin, outputMax;
     unsigned long lasttime;
