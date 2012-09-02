@@ -36,7 +36,7 @@ void setup() {
 
     Wire.begin(12);
 
-    Serial.println("I'm alive");
+    Serial.println("Good morning");
     runmtrs::setup();
     readencoders::setup();
 }
