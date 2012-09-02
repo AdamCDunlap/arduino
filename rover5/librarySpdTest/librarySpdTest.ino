@@ -1,4 +1,5 @@
 #include <Rover5.h>
+#include <Wire.h>
 #include <stdinout.h>
 
 //#define DEBUG
@@ -24,9 +25,6 @@ template <class T> inline void printTimeOf(T nm, unsigned long starttime) {
 Rover5 bot;
 
 void setup() {
-
-    delay(1000);
-
     Serial.begin(115200);
     TIME_OF(F("hello")) Serial.println(F("Hello!"));
     bot.begin();
@@ -40,14 +38,15 @@ void loop() {
         Serial.println(F("Give new values in the format: <x> <y> <rotation>"));
         scanf_P(PSTR("%d %d %d"), &x, &y, &rotation);
     }
-    TIME_OF(F("Run")) bot.Run(0, 255);
+    TIME_OF(F("Run")) bot.Run(x, y, rotation);
 
     int speeds[4];
     long xdist, ydist;
     unsigned int botangle;
+    TIME_OF(F("update")) bot.UpdateEncoders();
     TIME_OF(F("Get")) {
         bot.GetSpeeds(speeds);
-        bot.GetDist(&xdist, &ydist, &botangle);
+        bot.GetPos(&xdist, &ydist, &botangle);
     }
     
     TIME_OF(F("Print")) {
@@ -56,9 +55,7 @@ void loop() {
             Serial.print(speeds[i]);
             Serial.print(' ');
         }
-        printf_P(PSTR("Dist: x: %ld y: %ld z: %u"), xdist, ydist, botangle);
+        printf_P(PSTR("Spds: x:%4d y:%4d z:%4d Dist: x: %ld y: %ld z: %u"), x, y, rotation, xdist, ydist, botangle);
         Serial.println();
     }
-
-    //delay(500);
 }

@@ -11,6 +11,8 @@ long offset;
 void setup() {
     Serial.begin(115200);
     Serial.println(F("Good morning!"));
+    Serial.print(F("bot is ")); Serial.print(sizeof(bot));
+    Serial.println(F(" bytes"));
     bot.begin();
 
     Serial.println(F("Bot began"));

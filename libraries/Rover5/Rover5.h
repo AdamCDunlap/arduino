@@ -69,8 +69,6 @@ public:
    /**
     * @brief Gets the most recently specified powers for each motor.
     *
-    * This function populates the powers array with the most recently specified
-    * powers for each motor.
     * @param powers The array to put the powers into.
     */
     void GetPowers(int powers[4]);
@@ -80,8 +78,8 @@ public:
     *
     * This function populates the ticks array with the current encoder counts
     * for each motor.
-    * In addition to getting the current encoder counts, this function also
-    * updates the interal timelock of ticks used to calculate motor speed.
+    * The UpdateEncoders() method should be called before calling this
+    * method.
     * @param ticks The array to put the ticks into.
     */
     void GetTicks(long ticks[4]);
@@ -92,28 +90,38 @@ public:
     *
     * This function populates the speeds array with the current speeds in
     * milliinches (mills) per second for each motor.
-    * In addition to getting the current speeds, this function also
-    * updates the interal timelock of ticks used to calculate motor speed.
+    * The UpdateEncoders() method should be called before calling this
+    * method.
     * @param speeds The array to put the speeds into.
     */
     void GetSpeeds(int speeds[4]);
     
    /**
-    * @brief Update the internal speeds array.
+    * @brief Gets the current speeds for each motor.
     *
-    * Call this function iff the code will not be calling GetTicks or GetSpeeds
-    * for a while, but you will want to read the speeds eventually.
-    * @return whether or not speeds were updated (ie no problems).
+    * This function populates the speeds array with the current speeds in
+    * encoder ticks per second for each motor
+    * The UpdateEncoders() method should be called before calling this
+    * method.
+    * @param speeds The array to put the speeds into.
     */
-    bool UpdateSpeeds();
+    void GetTickSpeeds(int speeds[4]);
+
+   /**
+    * @brief Get new encoder values and update current position and speed
+    *
+    * Call this function before calling any methods that use the encoders.
+    * @return whether or not encoders were updated (ie no problems).
+    */
+    bool UpdateEncoders();
     
    /**
     * @brief Gets the current distances for each motor.
     *
     * This function populates the dists array with the current scaled encoder
     * counts for each motor, in milliinches (mills).
-    * In addition to getting the current encoder counts, this function also
-    * updates the interal timelock of ticks used to calculate motor speed.
+    * The UpdateEncoders() method should be called before calling this
+    * method.
     * @param dists The array to put the distances into.
     */
     void GetDists(long dists[4]);
@@ -121,35 +129,51 @@ public:
    /**
     * @brief Gets the current distance the robot has gone.
     *
-    * In addition to getting the current encoder counts, this function also
-    * updates the interal timelock of ticks used to calculate motor speed.
+    * The UpdateEncoders() method should be called before calling this
+    * method.
+    *
+    * Note that this function is different from the other two GetDist()
+    * functions. The others account for any turns the robot has made and 
+    * return field-relative x and y coordinates. This function simply returns
+    * a robot relative forward distance.
     * @return The forward distance the robot has gone in mills
     */
     long GetDist();
    /**
     * @brief Gets the current distance the robot has gone.
     *
-    * In addition to getting the current encoder counts, this function also
-    * updates the interal timelock of ticks used to calculate motor speed.
+    * The UpdateEncoders() method should be called before calling this
+    * method.
     * @param xdist The variable to store the lateral distance the robot has
     *              gone in mills.
     * @param ydist The variable to store the forward distance the robot has
     *              gone in mills.
     */
     void GetDist(long* xdist, long* ydist);
+
+
+   /**
+    * @brief Gets the current (x,y) position of the robot
+    *
+    * The UpdateEncoders() method should be called before calling this
+    * method.
+    * @param xpos The variable to store the x position of the robot in mills.
+    * @param xpos The variable to store the x position of the robot in mills.
+    */
+    void GetPos(long* xpos, long* ypos);
    /**
     * @brief Gets the current distance the robot has gone.
     *
-    * In addition to getting the current encoder counts, this function also
-    * updates the interal timelock of ticks used to calculate motor speed.
-    * @param xdist The variable to store the lateral distance the robot has
-    *              gone in mills.
-    * @param ydist The variable to store the forward distance the robot has
-    *              gone in mills.
+    * The UpdateEncoders() method should be called before calling this
+    * method.
+    * @param xpos The variable to store the x position of the robot in mills.
+    * @param xpos The variable to store the x position of the robot in mills.
     * @param angle The variable to store the current angle of the robot in
     *              milliradians
     */
-    void GetDist(long* xdist, long* ydist, unsigned int* angle);
+    void GetPos(long* xpos, long* ypos, unsigned int* angle);
+
+
 
     /**
     * @brief Sets the i2c address of the interface arduino
@@ -165,6 +189,7 @@ private:
     /// Factor to multiple ticks by to get mills
     // 2 pi * radius = circumference
     // there are 3 rotations of the wheel per 1000 ticks [rover5 manual]
+    // Ends up being 37.699111843077518861551720599354034610366032792501269
     static const double ticksToMills = (TWO_PI * wheelRadius * 3.0)/1000.0;
 
     /// i2c Address of the interface arduino
@@ -173,11 +198,16 @@ private:
     /// Current number of encoder ticks for each motor
     long ticks[4];
 
-    /// Current speeds for each motor in milliinches/second
+    /// Current speeds for each motor in encoder ticks/second
+    /// Maximum realistic value is about 25000
     int speeds[4];
 
     /// Current powers for each motor from -255 to 255
     int powers[4];
+
+    /// Current position of the robot, obtained from encoder data, in ticks
+    ///  and milliradians for angle
+    struct { long x; long y; unsigned int angle; } pos;
 
     // Circular buffer class holding the last ten tick counts and times
     template <size_t bufsz> struct TickLogs {
@@ -213,6 +243,16 @@ private:
     */
     void Run();
 
+   /**
+    * @brief Updates the speeds as part of the UpdateEncoders function
+    * @param ticks The current value of the ticks array
+    */
+    void UpdateSpeeds(long ticks[4]);
+
+   /**
+    * @brief Updates the pos array to reflect the current position
+    */
+    void UpdatePosition();
 };
 
 #endif // ROVER5_H

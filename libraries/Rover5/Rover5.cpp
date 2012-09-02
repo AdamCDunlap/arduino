@@ -11,8 +11,11 @@ void Rover5::begin() {
     //Wire.requestFrom(interfaceAddress, (uint8_t)16);
 
     for (size_t i=0; i<spdLogLen; i++) {
-        while(!UpdateSpeeds());
+        while(!UpdateEncoders());
     }
+
+    pos.x = pos.y = 0;
+    pos.angle = 0;
 }
 
 
@@ -70,7 +73,7 @@ void Rover5::Run() {
     powers[BR] *= -1;
     powers[BL] *= -1;
 }
-// Populates the powers array with the current speeds of each motor
+
 void Rover5::GetPowers(int powers[4]) {
     memcpy(powers, Rover5::powers, sizeof(Rover5::powers));
 }
@@ -78,52 +81,47 @@ void Rover5::GetPowers(int powers[4]) {
 // Populates the ticks array with the current number of encoder ticks for
 //  each motor
 void Rover5::GetTicks(long ticks[4]) {
-    UpdateSpeeds();
     memcpy(ticks, Rover5::ticks, sizeof(Rover5::ticks));
 }
 
-// Populates the speeds array with the current speed of each motor in
-//  mills per second
-void Rover5::GetSpeeds(int speeds[4]) {
-    UpdateSpeeds();
+void Rover5::GetTickSpeeds(int outspeeds[4]) {
     memcpy(speeds, Rover5::speeds, sizeof(Rover5::speeds));
 }
 
+void Rover5::GetSpeeds(int outspeeds[4]) {
+    for (uint8_t i=0; i<4; i++) {
+        outspeeds[i] = speeds[i] * ticksToMills;
+    }
+}
+
 void Rover5::GetDists(long dists[4]) {
-    UpdateSpeeds();
     for (uint8_t i=0; i<4; i++) {
         dists[i] = ticks[i] * ticksToMills;
     }
 }
 
 long Rover5::GetDist() {
-    UpdateSpeeds();
-    long yticks = 0;
-    for (uint8_t i=0; i<4; i++) {
-        yticks += (ticks[i]/4);
-    }
-    return yticks * ticksToMills;
+    return ((ticks[FL] + ticks[FR] + ticks[BL] + ticks[BR]) * ticksToMills)/4;
 }
 
 void Rover5::GetDist(long* xdist, long* ydist) {
-    UpdateSpeeds();
-    long yticks = +ticks[FL]/4 +ticks[FR]/4 +ticks[BL]/4 +ticks[BR]/4;
-    long xticks = +ticks[FL]/4 -ticks[FR]/4 -ticks[BL]/4 +ticks[BR]/4;
-
-    *xdist = xticks * ticksToMills;
-    *ydist = yticks * ticksToMills;
-}
-
-void Rover5::GetDist(long* xdist, long* ydist, unsigned int* angle) {
-    GetDist(xdist, ydist); // This calls updatespeeds
+    *xdist = ((+ticks[FL] -ticks[FR] -ticks[BL] +ticks[BR]) * ticksToMills)/4;
+    *ydist = ((+ticks[FL] +ticks[FR] +ticks[BL] +ticks[BR]) * ticksToMills)/4;
     
-    long rotationTicks = +ticks[FL]/4 -ticks[FR]/4 +ticks[BL]/4 -ticks[BR]/4;
-    *angle = rotationTicks; // XXX: This doesn't work
 }
 
-// Read the current distances from the interface arduino and calculates
-//  the speeds
-bool Rover5::UpdateSpeeds() {
+void Rover5::GetPos(long* xpos, long* ypos) {
+    *xpos = pos.x * ticksToMills;
+    *ypos = pos.y * ticksToMills;
+}
+
+void Rover5::GetPos(long* xpos, long* ypos, unsigned int* angle) {
+    *xpos = pos.x * ticksToMills;
+    *ypos = pos.y * ticksToMills;
+    *angle = pos.angle * ticksToMills;
+}
+
+bool Rover5::UpdateEncoders() {
 
     {
         //unsigned long endtime;
@@ -149,6 +147,13 @@ bool Rover5::UpdateSpeeds() {
     ticks[FR] *= -1;
     ticks[FL] *= -1;
 
+    UpdateSpeeds(ticks);
+
+    UpdatePosition();
+    return true;
+}
+
+void Rover5::UpdateSpeeds(long ticks[4]) {
     unsigned long curTime = micros();
 
     unsigned long timesDiff = curTime - tickLogs.times[tickLogs.nextEntry];
@@ -157,15 +162,68 @@ bool Rover5::UpdateSpeeds() {
         // Difference in ticks from oldest entry to entry about to be put in
         //  over difference in the times over the same
         long ticksDiff =  ticks[i] - tickLogs.ticks[tickLogs.nextEntry][i];
-        const float factor = 37699112.0;
-        speeds[i] = (int)(factor * (float)ticksDiff / (float)timesDiff);
+        speeds[i] = (int)(1000000.0 * (float)ticksDiff / (float)timesDiff);
         //Serial.print(F("ck")); Serial.print(i); Serial.print(F(": ")); Serial.print(ticksDiff); Serial.print(' ');
         //Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print('\t');
     }
     tickLogs.Put(ticks, curTime);
     //Serial.print('|');
+}
 
-    return true;
+void Rover5::UpdatePosition() {
+    // Variables used for integrating/dervitizing
+    unsigned long curTime = micros();
+    static unsigned long lastTime = curTime;
+    unsigned int timeDiff = curTime - lastTime;
+    lastTime = curTime;
+    
+    // "n" function to get the current rotational velocity
+
+    // use K as defined in Ether's paper
+    // "Kinematic Analysis of Four-Wheel Mecanum Vehicle"
+    // http://www.chiefdelphi.com/media/papers/download/2722
+
+    // 6.75 is wheel base in inches, 8.5 is track witdth
+    // Factor of (1000/ticksToMills) on each one is to convert to ticks
+    // dividing by 1000 makes it into milliradians
+    // Units: ticks/milliradian
+    // Ends up being 0.8090376273838012901584924638102813403418365325139869
+    const double K = (((6.75*(1000/ticksToMills))/2 + (8.5*(1000/ticksToMills))/2) * 4)/1000;
+    
+    // no need to integrate the speeds when the distances are there
+    //
+    //long angVel = (+speeds[FL] -speeds[FR] +speeds[BL] -speeds[BR])/K;
+    // Integrate angVel to get the angle
+    // Devide by 1000000 to convert from microseconds to seconds
+    //pos.angle += (angVel * (currentTime - lastTime)) / 1000000;
+    
+    pos.angle = ticksToMills * (double)(+ticks[FL] -ticks[FR] +ticks[BL] -ticks[BR])/K;
+
+    
+    // "r" function to get the field relative velocity and rotational velocity
+    
+    // the postfix r means it's robot relative
+    // These are in ticks/second
+    int xvelr = (+(long)speeds[FL] -(long)speeds[FR] -(long)speeds[BL] +(long)speeds[BR])/4;
+    int yvelr = (+(long)speeds[FL] +(long)speeds[FR] +(long)speeds[BL] +(long)speeds[BR])/4;
+
+    printf_P(PSTR("xvelr%5d yvelr%5d "), xvelr, yvelr);
+
+    // Now rotate the vector
+    float sinA = sin(pos.angle/1000.0);
+    float cosA = cos(pos.angle/1000.0);
+    int xvel = (int)(xvelr * cosA - yvelr * sinA);
+    int yvel = (int)(xvelr * sinA + yvelr * cosA);
+
+    // max val of xvel is 25000
+    // ((2^32)-1)/25000 = 172,000, which would mean if timeDiff is more than
+    // 172 milliseconds, it would overflow. So first divide timediff by 10
+    // (not much is lost since micros() only has a precision of 4) so that
+    // a full second and half can go by without overflow. More than that and
+    // the user deserves to get wrong answers.
+    pos.x  += (((long)xvel * (long)(timeDiff/10))/100000);
+    pos.y  += (((long)yvel * (long)(timeDiff/10))/100000);
+
 }
 
 void Rover5::Normalize4(int nums[4], int maximum) {
