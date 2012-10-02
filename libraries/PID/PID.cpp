@@ -19,7 +19,7 @@ internal_t PID::GetOutput(internal_t cur, internal_t setpoint, unsigned long tim
     internal_t Pval = kP * error;
     internal_t Dval = kD * ((lastInput - cur) / (time - lasttime));
 
-    printf_P(PSTR("ErrSum: %.2f Timediff: %lu  Inputdiff: %2.0f "), errorSum, time - lasttime, lastInput - cur);
+    //printf_P(PSTR("ErrSum: %.2f Timediff: %lu  Inputdiff: %2.0f "), errorSum, time - lasttime, lastInput - cur);
 
     errorSum += kI * error * (time - lasttime);
          if (errorSum > outputMax) errorSum = outputMax;
