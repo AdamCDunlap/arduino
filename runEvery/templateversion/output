@@ -1,0 +1,26 @@
+BestFitUInt<5>::max_32: 4294967195
+BestFitUInt<5>::max_16: 65435
+BestFitUInt<5>::max_8: 155
+
+Number: 126	Type: uint8_t 
+Number: 127	Type: uint8_t 
+Number: 128	Type: uint8_t 
+
+Number: 154	Type: uint8_t 
+Number: 155	Type: uint8_t 
+Number: 156	Type: uint16_t
+
+Number: 65434	Type: uint16_t
+Number: 65435	Type: uint16_t
+Number: 65436	Type: uint32_t
+
+Number: 65534	Type: uint32_t
+Number: 65535	Type: uint32_t
+Number: 65536	Type: uint32_t
+
+Number: 4294967194	Type: uint32_t
+Number: 4294967195	Type: uint32_t
+Number: 4294967196	Type: uint64_t
+
+Number: 4294967294	Type: uint64_t
+Number: 4294967295	Type: uint64_t
