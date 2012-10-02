@@ -4,9 +4,7 @@
 #include <Wire.h>
 
 Rover5 bot;
-PID botPID(false, -255, 255);
-
-long offset;
+PID botPID(true, -255, 255);
 
 void setup() {
     Serial.begin(115200);
@@ -16,11 +14,6 @@ void setup() {
     bot.begin();
 
     Serial.println(F("Bot began"));
-
-    long encoderDists[4];
-    
-    bot.GetTicks(encoderDists);
-    offset = encoderDists[Rover5::FL];
 }
 
 void loop() {
@@ -60,13 +53,17 @@ void loop() {
     }
     botPID.SetPID(P, I, D);
 
-    long encoderDists[4];
-    
-    bot.GetTicks(encoderDists);
-    int wheelspd = botPID.GetOutput(encoderDists[Rover5::FL]-offset, setpoint, micros());
+    bot.UpdateEncoders();
+
+    long encdists[4];
+    bot.GetDists(encdists);
+
+    long xdist, ydist;
+    bot.GetPos(&xdist, &ydist);
+    int wheelspd = botPID.GetOutput(xdist, setpoint, micros());
     bot.Run(0, wheelspd);
     
-    printf_P(PSTR("P:%2f I:%2f D:%2f curdist:%6ld setpoint:%6ld curspd:%4d\n"),
-                   P, I, D, encoderDists[Rover5::FL]-offset, setpoint, wheelspd);
-    delay(50);
+    //printf_P(PSTR(/*"P:%.2f I:%.2f D:%.2f "*/"curdist:%4ld setpoint:%4ld curspd:%4d\n"),
+    //                      P,     I,     D,           xdist,     setpoint,  wheelspd);
+    delay(10);
 }
