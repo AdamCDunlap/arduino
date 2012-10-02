@@ -129,18 +129,18 @@ public:
    /**
     * @brief Gets the current distance the robot has gone.
     *
+    * This function just uses the current encoder counts.
+    *
     * The UpdateEncoders() method should be called before calling this
     * method.
     *
-    * Note that this function is different from the other two GetDist()
-    * functions. The others account for any turns the robot has made and 
-    * return field-relative x and y coordinates. This function simply returns
-    * a robot relative forward distance.
     * @return The forward distance the robot has gone in mills
     */
     long GetDist();
    /**
     * @brief Gets the current distance the robot has gone.
+    *
+    * This function just uses the current encoder counts.
     *
     * The UpdateEncoders() method should be called before calling this
     * method.
@@ -162,7 +162,7 @@ public:
     */
     void GetPos(long* xpos, long* ypos);
    /**
-    * @brief Gets the current distance the robot has gone.
+    * @brief Gets the current position and angle of the robot
     *
     * The UpdateEncoders() method should be called before calling this
     * method.
@@ -190,7 +190,8 @@ private:
     // 2 pi * radius = circumference
     // there are 3 rotations of the wheel per 1000 ticks [rover5 manual]
     // Ends up being 37.699111843077518861551720599354034610366032792501269
-    static const double ticksToMills = (TWO_PI * wheelRadius * 3.0)/1000.0;
+    //static const double ticksToMills = (TWO_PI * wheelRadius * 3.0)/1000.0;
+    static const double ticksToMills = 1;
 
     /// i2c Address of the interface arduino
     uint8_t interfaceAddress;
@@ -207,10 +208,11 @@ private:
 
     /// Current position of the robot, obtained from encoder data, in ticks
     ///  and milliradians for angle
-    struct { long x; long y; unsigned int angle; } pos;
+    //struct { long x; long y; unsigned int angle; } pos;
+    struct { float x; long y; float angle; } pos;
 
     // Circular buffer class holding the last ten tick counts and times
-    template <size_t bufsz> struct TickLogs {
+    template <uint8_t bufsz> struct TickLogs {
         long ticks[bufsz][4];
         unsigned long times[bufsz];
         uint8_t nextEntry;
@@ -225,7 +227,8 @@ private:
         }
     };
 
-    static const size_t spdLogLen = 10;
+    //static const uint8_t spdLogLen = 10;
+    static const uint8_t spdLogLen = 1;
     TickLogs<spdLogLen> tickLogs;
 
     // Scales array down to be under maximum but the same relative to

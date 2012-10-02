@@ -14,7 +14,8 @@ void Rover5::begin() {
         while(!UpdateEncoders());
     }
 
-    pos.x = pos.y = 0;
+    pos.x = 0;
+    pos.y = 0;
     pos.angle = 0;
 }
 
@@ -74,18 +75,18 @@ void Rover5::Run() {
     powers[BL] *= -1;
 }
 
-void Rover5::GetPowers(int powers[4]) {
-    memcpy(powers, Rover5::powers, sizeof(Rover5::powers));
+void Rover5::GetPowers(int outpowers[4]) {
+    memcpy(outpowers, Rover5::powers, sizeof(Rover5::powers));
 }
 
 // Populates the ticks array with the current number of encoder ticks for
 //  each motor
-void Rover5::GetTicks(long ticks[4]) {
-    memcpy(ticks, Rover5::ticks, sizeof(Rover5::ticks));
+void Rover5::GetTicks(long outticks[4]) {
+    memcpy(outticks, Rover5::ticks, sizeof(Rover5::ticks));
 }
 
 void Rover5::GetTickSpeeds(int outspeeds[4]) {
-    memcpy(speeds, Rover5::speeds, sizeof(Rover5::speeds));
+    memcpy(outspeeds, Rover5::speeds, sizeof(Rover5::speeds));
 }
 
 void Rover5::GetSpeeds(int outspeeds[4]) {
@@ -207,13 +208,11 @@ void Rover5::UpdatePosition() {
     int xvelr = (+(long)speeds[FL] -(long)speeds[FR] -(long)speeds[BL] +(long)speeds[BR])/4;
     int yvelr = (+(long)speeds[FL] +(long)speeds[FR] +(long)speeds[BL] +(long)speeds[BR])/4;
 
-    printf_P(PSTR("xvelr%5d yvelr%5d "), xvelr, yvelr);
-
     // Now rotate the vector
     float sinA = sin(pos.angle/1000.0);
     float cosA = cos(pos.angle/1000.0);
-    int xvel = (int)(xvelr * cosA - yvelr * sinA);
-    int yvel = (int)(xvelr * sinA + yvelr * cosA);
+    float xvel = /*(int)*/(xvelr * cosA - yvelr * sinA);
+    float yvel = /*(int)*/(xvelr * sinA + yvelr * cosA);
 
     // max val of xvel is 25000
     // ((2^32)-1)/25000 = 172,000, which would mean if timeDiff is more than
@@ -221,9 +220,13 @@ void Rover5::UpdatePosition() {
     // (not much is lost since micros() only has a precision of 4) so that
     // a full second and half can go by without overflow. More than that and
     // the user deserves to get wrong answers.
-    pos.x  += (((long)xvel * (long)(timeDiff/10))/100000);
-    pos.y  += (((long)yvel * (long)(timeDiff/10))/100000);
+    //pos.x  += (((long)xvel * (long)(timeDiff/10))/100000);
+    //pos.y  += (((long)yvel * (long)(timeDiff/10))/100000);
+    pos.x  += (((float)xvel * (float)(timeDiff/10))/100000);
+    pos.y  += (((float)yvel * (float)(timeDiff/10))/100000);
 
+    printf_P(PSTR("xvelr%5d yvelr%5d sinA %.3f xvel %.3f yvel %.3f pos.x % f pos.y % f pos.angle % f enc[FL] %ld enc[FR] %ld enc[BL] %ld enc[BR] %ld\r\n"),
+                      xvelr,   yvelr,     sinA,     xvel,     yvel,    pos.x,    pos.y,    pos.angle,  ticks[FL],  ticks[FR],  ticks[BL],  ticks[BR]);
 }
 
 void Rover5::Normalize4(int nums[4], int maximum) {
