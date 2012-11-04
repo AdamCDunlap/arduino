@@ -1,7 +1,7 @@
 #include "readencoders.h"
 
 //#define USE_ASSEMBLER
-#define USE_OPTIMIZED
+//#define USE_OPTIMIZED
 
 void i2cRequest();
 
