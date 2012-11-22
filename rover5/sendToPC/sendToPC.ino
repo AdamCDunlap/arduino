@@ -48,6 +48,7 @@ void printdata() {
     Serial.write('C');
 
     Serial.write((uint8_t *)&endmicros, 4);
+    Serial.write('D');
 
 
     //printf("%10lu %4ld %4ld %4ld %4ld % 4d % 4d % 4d % 4d %4ld %4ld %5u %10lu\n",
@@ -116,16 +117,18 @@ void setup() {
     bot.begin();
 
     //Serial.print("begin"); // Provide start marker
-    //Serial.print((uint16_t)13); // Print number of things that will be printed
+    //Serial.write((uint8_t)13, 2); // Print number of things that will be printed
+
     // Text will be printed normally unless in <>
     // Then first character will be a u or an s representing if the value is
     //  signed or unsigned
     // Second character will be number of bytes
     // Rest of text will be name
+    // Format string ends when newline is encountered
 
     //Serial.print(F("0<u4stmicros>1<s4fld>2<s4frd>3<s4bld>4<s4brd>5"
     //               "<s2flp>6<s2frp>7<s2blp>8<s2brp>9<s4xpos>A"
-    //               "<s4ypos>B<s4ang>C<u4endmicros>D"));
+    //               "<s4ypos>B<s4ang>C<u4endmicros>D\n"));
 }
 
 void loop() {
