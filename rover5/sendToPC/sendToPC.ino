@@ -131,13 +131,20 @@ void setup() {
     //               "<s4ypos>B<s4ang>C<u4endmicros>D\n"));
 }
 
+size_t bufpos;
+char buf[128];
+
+int16_t x, y, z;
 void loop() {
-    bot.Run(100, 0, 0);
-    mydelay(500);
-    bot.Run(0, 100, 0);
-    mydelay(500);
-    bot.Run(0, 0, 100);
-    mydelay(500);
-    bot.Run(0, 0, 0);
-    mydelay(500);
+    if (Serial.available()) {
+        buf[bufpos++] = Serial.read();
+        if (bufpos > 6) {
+            memcpy(&x, &buf[0*sizeof(x)], sizeof(x));
+            memcpy(&y, &buf[1*sizeof(x)], sizeof(x));
+            memcpy(&z, &buf[2*sizeof(x)], sizeof(x));
+            bufpos = 0;
+        }
+    }
+    bot.Run(x, y, z);
+    printdata();
 }
