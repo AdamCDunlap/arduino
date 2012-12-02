@@ -1,6 +1,8 @@
-These are all of my files I wrote for arduino. Some are for 0022, some are for
-1.0. I've tried to keep the files for 0022 with the .pde extension and the ones
-for 1.0 with the .ino extension, but mistakes are made.
+These are all of my arduino programs.
 
-Some files have the .vi extensions; these are files for a language called
-LabVIEW.
+I use GNU make rather than the arduino IDE; however, most files should be
+compatible with both. The main Makefile I use can be found here:
+https://github.com/WizenedEE/Arduino-Makefile
+sysoptions.mk will likely have to be reconfigured for each person depending on
+how their filesystems are set up, and Makefile in the root directory is just
+for easy copying.
