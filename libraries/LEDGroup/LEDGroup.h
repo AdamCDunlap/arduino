@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 namespace Patt {
-    enum Pattern { OFF, ON, CIRCULAR, BACK_AND_FORTH, FLASHING};
+    enum Pattern { OFF, ON, CIRCULAR, BACK_AND_FORTH, FLASHING, STASIS};
 }
 
 class LEDGroup {
@@ -11,6 +11,11 @@ public:
     LEDGroup(int pins[], size_t len) {
         memcpy(this->pins, pins, len * sizeof(pins[0]));
         this->len = len;
+    }
+    void setup() {
+        for (size_t i=0; i<len; i++) {
+            pinMode(pins[i], OUTPUT);
+        }
     }
     void runPattern(Patt::Pattern patt, unsigned long changeTime = 500/*, bool fade = false*/) {
         unsigned long curTime = millis();
@@ -75,6 +80,10 @@ public:
             }
             break;
         }
+        case Patt::STASIS:
+            break;
+        default:
+            break;
         }
         lastTime = curTime;
     }
