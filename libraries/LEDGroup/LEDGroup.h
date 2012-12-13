@@ -8,8 +8,8 @@ namespace Patt {
 
 class LEDGroup {
 public:
-    LEDGroup(int pins[], size_t len) {
-        memcpy(this->pins, pins, len * sizeof(pins[0]));
+    LEDGroup(int* pins, size_t len) {
+        this->pins = pins; // Copy address
         this->len = len;
     }
     void setup() {
@@ -88,7 +88,7 @@ public:
         lastTime = curTime;
     }
 private:
-    int pins[];
+    int* pins;
     size_t len;
 };
 #endif //LEDPATTERN_H
