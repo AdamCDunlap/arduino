@@ -38,13 +38,9 @@ public:
             if (curTime - lastTime >= changeTime) {
                 static size_t whichPin = 0;
                 for (size_t i=0; i<len; i++) {
-                    if (i == whichPin) {
-                        digitalWrite(pins[i], HIGH);
-                    }
-                    else {
-                        digitalWrite(pins[i], LOW);
-                    }
+                    digitalWrite(pins[i], i == whichPin);
                 }
+
                 if (whichPin >= len) whichPin = 0;
                 else                 whichPin++;
             }
@@ -56,14 +52,9 @@ public:
                 static size_t whichPin = 0;
                 static bool forward = true;
                 for (size_t i=0; i<len; i++) {
-                    if (i == whichPin) {
-                        digitalWrite(pins[i], HIGH);
-                    }
-                    else {
-                        digitalWrite(pins[i], LOW);
-                    }
+                    digitalWrite(pins[i], i == whichPin);
                 }
-                if (whichPin >= len) forward = false;
+                if (whichPin >= len-1 ) forward = false;
                 else if (whichPin <= 0) forward = true;
                 whichPin += forward? +1 : -1;
             }
