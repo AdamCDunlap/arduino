@@ -1,0 +1,45 @@
+#ifndef SOFTBLINK_H
+#define SOFTBLINK_H
+
+#include <Arduino.h>
+
+class SoftBlink {
+
+public:
+    SoftBlink() : pinNum(-1), changeLength((unsigned int)-1), curBrightness(0) {
+    }
+    SoftBlink(int inpinNum) : pinNum(inpinNum), changeLength((unsigned int)-1), curBrightness(0) {
+    }
+    SoftBlink(int inpinNum, unsigned int infadeTime) : pinNum(inpinNum), changeLength(infadeTime/255), curBrightness(0) {
+    }
+    SoftBlink(int inpinNum, unsigned int infadeTime, bool startOn)
+        : pinNum(inpinNum), changeLength(infadeTime), curBrightness(startOn? 255:0) {
+    }
+    void setPin(int inpinNum) {
+        pinNum = inpinNum;
+    }
+    void setFadeTime(unsigned int infadeTime) {
+        changeLength = infadeTime;
+    } 
+    void write(bool state) {
+        static unsigned long changeTime = 0;
+        static bool lastState = false;
+
+        if (state != lastState) {
+            lastState = state;
+            changeTime = micros();
+        }
+        if ((state && curBrightness < 255 || !state && curBrightness > 0)
+            && micros() - changeTime > ) {
+        }
+        analogWrite(pinNum, curBrightness);
+        analogWrite(pinNum, constrain(map(millis() - changeTime, 0, fadeTime, state? 0:255, state? 255:0), 0, 255));
+    }
+
+private:
+    int pinNum;
+    unsigned int changeLength;
+    uint8_t curBrightness;
+};
+
+#endif
