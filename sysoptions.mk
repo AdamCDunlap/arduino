@@ -13,10 +13,10 @@ CPPFLAGS += -Os -Wall
 
 ifeq ($(wildcard /dev/ttyUSB*),)
 	BOARD_TAG ?= uno
-	ARDUINO_PORT = /dev/ttyACM*
+	ARDUINO_PORT ?= /dev/ttyACM*
 else
 	BOARD_TAG ?= atmega328
-	ARDUINO_PORT = /dev/ttyUSB*
+	ARDUINO_PORT ?= /dev/ttyUSB*
 endif
 
 ifndef ARDUINO_VERSION
