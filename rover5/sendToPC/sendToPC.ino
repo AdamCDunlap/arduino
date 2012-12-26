@@ -1,4 +1,4 @@
-// sendToPC.ino
+// sendToPC.ino vim:nowrap
 #include <Rover5.h>
 #include <Wire.h>
 #include <stdinout.h>
@@ -6,8 +6,10 @@
 Rover5 bot;
 
 void printdata() {
-    //       1 u4       1 s4  1 s4  1 s4  1 s4  1 s2   1 s2 1 s2  1 s2  1 s4   1 s4   1 s4  1 u4        1
-    // Print 0<stmicros>1<fld>2<frd>3<bld>4<brd>5<flp>6<frp>7<blp>8<brp>9<xpos>A<ypos>B<ang>C<endmicros>D
+    // 1 u4       1 s4  1 s4  1 s4  1 s4  1 s2   1 s2 1 s2  1 s2  1 s4   
+    // 0<stmicros>1<fld>2<frd>3<bld>4<brd>5<flp>6<frp>7<blp>8<brp>9<xpos>
+    // 1 s4   1 s4  1 s4    1 s4    1 s2  1 s2  1 s2  1 s2    u4        1
+    // A<ypos>B<ang>C<xdist>D<ydist>E<fls>F<frs>G<bls>H<brs>I<endmicros>J
     uint32_t stmicros = micros();
     bot.UpdateEncoders();
     uint32_t endmicros = micros();
@@ -18,6 +20,10 @@ void printdata() {
     int32_t xpos, ypos;
     uint16_t ang;
     bot.GetPos(&xpos, &ypos, &ang);
+    int32_t xdist, ydist;
+    bot.GetDist(&xdist, &ydist);
+    int16_t spds[4];
+    bot.GetSpeeds(spds);
 
     Serial.write('0');
     Serial.write((uint8_t *)&stmicros, 4);
@@ -47,8 +53,22 @@ void printdata() {
     Serial.write((uint8_t *)&ang, 4);
     Serial.write('C');
 
-    Serial.write((uint8_t *)&endmicros, 4);
+    Serial.write((uint8_t *)&xdist, 4);
     Serial.write('D');
+    Serial.write((uint8_t *)&ydist, 4);
+    Serial.write('E');
+
+    Serial.write((uint8_t *)&spds[Rover5::FL], 2);
+    Serial.write('F');
+    Serial.write((uint8_t *)&spds[Rover5::FR], 2);
+    Serial.write('G');
+    Serial.write((uint8_t *)&spds[Rover5::BL], 2);
+    Serial.write('H');
+    Serial.write((uint8_t *)&spds[Rover5::BR], 2);
+    Serial.write('I');
+
+    Serial.write((uint8_t *)&endmicros, 4);
+    Serial.write('J');
 
 
     //printf("%10lu %4ld %4ld %4ld %4ld % 4d % 4d % 4d % 4d %4ld %4ld %5u %10lu\n",
@@ -138,13 +158,14 @@ int16_t x, y, z;
 void loop() {
     if (Serial.available()) {
         buf[bufpos++] = Serial.read();
-        if (bufpos > 6) {
+        if (bufpos >= 6) {
             memcpy(&x, &buf[0*sizeof(x)], sizeof(x));
-            memcpy(&y, &buf[1*sizeof(x)], sizeof(x));
-            memcpy(&z, &buf[2*sizeof(x)], sizeof(x));
+            memcpy(&y, &buf[1*sizeof(y)], sizeof(y));
+            memcpy(&z, &buf[2*sizeof(z)], sizeof(z));
             bufpos = 0;
         }
     }
     bot.Run(x, y, z);
     printdata();
 }
+

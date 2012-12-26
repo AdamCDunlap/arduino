@@ -1,24 +1,24 @@
-arduino 1 -- encoder decoder and motor controller:
-        00 - serial
-        01 - serial
-        02 - encoder1A
-        03 - encoder1B
-        04 - encoder2A
-        05 - mtr1pwm
-        06 - mtr1dir
-        07 - encoder2B
-        08 - encoder3A
-        09 - mtr2pwm
-        10 - mtr3pwm
-        11 - mtr4pwm
-        12 - encoder3B
-        13 - mtr2dir
-a       14 - encoder4A
-n       15 - encoder4B
-a       16 - mtr3dir
-l       17 - mtr4dir
-o       18 - i2c communication
-g       19 - i2c
+arduino 1 -- encoder decoder and motor controller (on breadboard)
+ D0 16  00 - serialrx
+ D1 17  01 - serialtx
+ D2 18  02 - enc4B
+ D3 19  03 - enc4A
+ D4 20  04 - enc3B
+ D5 21  05 - enc3A
+ D6 22  06 - pwm4
+ D7 23  07 - dir4
+ B0  0  08 - enc2B
+ B1  1  09 - pwm3
+ B2  2  10 - pwm2
+ B3  3  11 - pwm1
+ B4  4  12 - enc2A
+ B5  5  13 - dir3
+aC0  8  14 - enc1A
+nC1  9  15 - enc1B
+aC2 10  16 - dir2
+lC3 11  17 - dir1
+oC4 12  18 - i2cSDA
+gC5 13  19 - i2cSCL
 
 arduino 2 -- logic:
         00 - serial

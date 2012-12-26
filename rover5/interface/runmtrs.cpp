@@ -35,7 +35,7 @@ void runmtrs::loop() {
         }
         else { // Received enough bytes
 // second byte read (for each motor)is sign bit, so write that to the dir pin
-// first byte read is the actual number. However, since it's two's compliment,
+// first byte read is the actual number. However, since it's two's complement,
 //  we need to negate it before using
             bool dir;
             uint8_t spd;
