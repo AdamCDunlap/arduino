@@ -1,15 +1,11 @@
-ARDUINO_DIR = /home/adam/arduino-unstable
-ARDMK_DIR = /home/adam/patches/Arduino-Makefile
-AVR_TOOLS_DIR = /usr
-ARDUINO_SKETCHBOOK = /home/adam/arduino
-AVRDUDE = $(ARDUINO_DIR)/hardware/tools/avrdude
-AVRDUDE_CONF = $(ARDUINO_DIR)/hardware/tools/avrdude.conf
+ARDUINO_DIR        ?= /home/adam/arduino-unstable
+ARDMK_DIR          ?= /home/adam/patches/Arduino-Makefile
+AVR_TOOLS_DIR      ?= /usr
+ARDUINO_SKETCHBOOK ?= /home/adam/arduino
+AVRDUDE            ?= $(ARDUINO_DIR)/hardware/tools/avrdude
+AVRDUDE_CONF       ?= $(ARDUINO_DIR)/hardware/tools/avrdude.conf
 
-CPPFLAGS += -Os -Wall
-
-#ifndef MONITOR_BAUDRATE
-#	MONITOR_BAUDRATE = 115200
-#endif
+CPPFLAGS += -Os -Wall -Wextra
 
 ifeq ($(wildcard /dev/ttyUSB*),)
 	BOARD_TAG ?= uno
@@ -19,9 +15,7 @@ else
 	ARDUINO_PORT ?= /dev/ttyUSB*
 endif
 
-ifndef ARDUINO_VERSION
-	ARDUINO_VERSION = 101
-endif
+ARDUINO_VERSION ?= 103
 
 u: upload
 m: monitor
@@ -30,4 +24,3 @@ mu: u m
 .DEFAULT_GOAL := all
 
 include $(ARDMK_DIR)/arduino-mk/Arduino.mk
-

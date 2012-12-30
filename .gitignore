@@ -1,5 +1,5 @@
 .*.swp
 *~
-build-cli/
+build-*/
 tmp/
 doc/
