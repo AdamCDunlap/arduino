@@ -8,5 +8,10 @@ void setup() {
 }
 
 void loop() {
-    jag.write(map(analogRead(A0), 0, 1023, 0, 180));
+    //// Forward and backward
+    jag.writeMicroseconds(map(analogRead(A0), 0, 1023, 670, 2330));
+    // Only go forward
+    //jag.writeMicroseconds(map(analogRead(A0), 0, 1023, 1500, 2330));
+    // Only go backward
+    //jag.writeMicroseconds(map(analogRead(A0), 0, 1023,  670, 1500));
 }
