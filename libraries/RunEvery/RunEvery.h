@@ -9,6 +9,8 @@
 
 #define runEvery(t) _runEveryBase(t,millis())
 
+#define runEveryMillis(t) _runEveryBase(t,millis())
+
 #define runEveryMicros(t) _runEveryBase(t,micros())
 
 #endif // RUNEVERY_H
