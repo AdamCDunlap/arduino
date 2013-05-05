@@ -1,4 +1,4 @@
-ARDUINO_DIR        ?= /home/adam/arduino-unstable
+ARDUINO_DIR        ?= /home/adam/patches/arduino-unstable
 ARDMK_DIR          ?= /home/adam/patches/Arduino-Makefile
 AVR_TOOLS_DIR      ?= /usr
 ARDUINO_SKETCHBOOK ?= /home/adam/arduino
