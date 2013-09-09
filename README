@@ -2,7 +2,7 @@ These are all of my arduino programs.
 
 I use GNU make rather than the arduino IDE; however, most files should be
 compatible with both. The main Makefile I use can be found here:
-https://github.com/WizenedEE/Arduino-Makefile
+https://github.com/AdamCDunlap/Arduino-Makefile
 sysoptions.mk will likely have to be reconfigured for each person depending on
 how their filesystems are set up, and Makefile in the root directory is just
 for easy copying.
