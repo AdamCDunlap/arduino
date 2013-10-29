@@ -3,7 +3,7 @@
 
 #define _RETYPE(t) uint16_t
 #define _runEveryBase(t,f) for \
-    (static _RETYPE(t) _lasttime;\
+    (static _RETYPE(t) _lasttime = f;\
     (_RETYPE(t))((_RETYPE(t))f - _lasttime) >= (t);\
      _lasttime += (t))
 
