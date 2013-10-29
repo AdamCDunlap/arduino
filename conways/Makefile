@@ -1,3 +1,3 @@
 ARDUINO_LIBS = LEDArray
 
-include ~/arduino/sysoptions.mk
+include ~/docs/arduino/sysoptions.mk

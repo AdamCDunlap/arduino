@@ -1,2 +1,2 @@
 ARDUINO_LIBS=STDINOUT
-include ~/arduino/sysoptions.mk
+include ~/docs/arduino/sysoptions.mk

@@ -1,2 +1,2 @@
 ARDUINO_LIBS=
-include ~/arduino/sysoptions.mk
+include ~/docs/arduino/sysoptions.mk

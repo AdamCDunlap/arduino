@@ -388,41 +388,41 @@ void LEDArray::write(const char *str){
 }
 #endif
 
-void numDisplay::sendData(int data, int chipSelect = 0){
-	for(int i=0;i<(chipSelect >> 3);i++){
-		digitalWrite(clockPin, HIGH); //Give zeroes to all
-		digitalWrite(clockPin, LOW); //the chips before
-	}	
-	shiftOut(dataPin, clockPin, MSBFIRST, data>>8);
-	shiftOut(dataPin, clockPin, MSBFIRST, data);
-	digitalWrite(latchPin, HIGH);
-	digitalWrite(latchPin, LOW);
-	digitalWrite(dataPin, LOW);
-}
-
-numDisplay::numDisplay (uint8_t _dataPin, uint8_t _clockPin,
-	uint8_t _latchPin, uint8_t _digits = 1){	
-	dataPin = _dataPin;
-	clockPin = _clockPin;
-	latchPin = _latchPin;
-	digits = _digits;
-	pinMode(dataPin, OUTPUT);
-	pinMode(clockPin, OUTPUT);
-	pinMode(latchPin, OUTPUT);
-	digitalWrite(dataPin, LOW);
-	digitalWrite(clockPin, LOW);
-	digitalWrite(latchPin, LOW);
-	numberOfChips = (digits >> 3) + 1; //8 digits per chip
-	for(uint8_t i=0; i<numberOfChips;i++){
-		sendData(0x09FF, i); //Decode Mode: All
-		sendData(0x0A0F, i); //Intensity: 31/32 (Max)
-	}
-	if(numberOfChips == 1){
-		sendData(0x0B00 | digits); //Scan Limit: Digits 
-	}
-	else {
-		for(int i=0;i<numberOfChips;i++){ // If we have more than one chip,
-			sendData(0x0B07, i);          // set the scan limit to max on each one
-		}                                 // so the brightnesses are equal.
-	}
-}
+//void numDisplay::sendData(int data, int chipSelect = 0){
+//	for(int i=0;i<(chipSelect >> 3);i++){
+//		digitalWrite(clockPin, HIGH); //Give zeroes to all
+//		digitalWrite(clockPin, LOW); //the chips before
+//	}	
+//	shiftOut(dataPin, clockPin, MSBFIRST, data>>8);
+//	shiftOut(dataPin, clockPin, MSBFIRST, data);
+//	digitalWrite(latchPin, HIGH);
+//	digitalWrite(latchPin, LOW);
+//	digitalWrite(dataPin, LOW);
+//}
+//
+//numDisplay::numDisplay (uint8_t _dataPin, uint8_t _clockPin,
+//	uint8_t _latchPin, uint8_t _digits = 1){	
+//	dataPin = _dataPin;
+//	clockPin = _clockPin;
+//	latchPin = _latchPin;
+//	digits = _digits;
+//	pinMode(dataPin, OUTPUT);
+//	pinMode(clockPin, OUTPUT);
+//	pinMode(latchPin, OUTPUT);
+//	digitalWrite(dataPin, LOW);
+//	digitalWrite(clockPin, LOW);
+//	digitalWrite(latchPin, LOW);
+//	numberOfChips = (digits >> 3) + 1; //8 digits per chip
+//	for(uint8_t i=0; i<numberOfChips;i++){
+//		sendData(0x09FF, i); //Decode Mode: All
+//		sendData(0x0A0F, i); //Intensity: 31/32 (Max)
+//	}
+//	if(numberOfChips == 1){
+//		sendData(0x0B00 | digits); //Scan Limit: Digits 
+//	}
+//	else {
+//		for(int i=0;i<numberOfChips;i++){ // If we have more than one chip,
+//			sendData(0x0B07, i);          // set the scan limit to max on each one
+//		}                                 // so the brightnesses are equal.
+//	}
+//}

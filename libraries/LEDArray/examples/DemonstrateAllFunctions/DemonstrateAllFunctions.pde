@@ -52,7 +52,7 @@ unsigned char smiley[8] = {               // Define a picture of a smiley face
   B00111100,
 };
 
-prog_uchar heart[8] = {          // Define a picture of a heart in program memory, so it does not take up valuable RAM
+const unsigned char PROGMEM heart[8] = {          // Define a picture of a heart in program memory, so it does not take up valuable RAM
   B01100110,
   B11011011,
   B11000011,

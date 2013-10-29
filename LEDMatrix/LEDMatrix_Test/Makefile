@@ -1,3 +1,2 @@
-ARDUINO_LIBS=
-CPPFLAGS=-w
+ARDUINO_LIBS=LEDArray
 include ~/docs/arduino/sysoptions.mk

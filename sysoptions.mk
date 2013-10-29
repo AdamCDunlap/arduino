@@ -1,12 +1,13 @@
-ARDUINO_DIR        ?= /home/adam/patches/arduino-unstable
-ARDMK_DIR          ?= /home/adam/patches/Arduino-Makefile
+ARDUINO_DIR        ?= /usr/share/arduino
+ARDMK_DIR          ?= /home/adam/src/Arduino-Makefile
 AVR_TOOLS_DIR      ?= /usr
-ARDUINO_SKETCHBOOK ?= /home/adam/arduino
+ARDUINO_SKETCHBOOK ?= /home/adam/docs/arduino
 AVRDUDE            ?= $(ARDUINO_DIR)/hardware/tools/avrdude
 AVRDUDE_CONF       ?= $(ARDUINO_DIR)/hardware/tools/avrdude.conf
 
 CPPFLAGS += -Os -Wall -Wextra
 
+#ARDUINO_PORT ?= /dev/ttyUSB*
 ifeq ($(wildcard /dev/ttyUSB*),)
 	BOARD_TAG ?= uno
 	ARDUINO_PORT ?= /dev/ttyACM*

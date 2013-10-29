@@ -107,33 +107,10 @@ void setup() {
 #endif
     //set_sleep_mode(SLEEP_MODE_EXT_STANDBY);
 
-//    pinMode(leds::it_is, OUTPUT);
-//    for (short i=0;i<7;i++)
-//        pinMode(leds::minuteNums[i], OUTPUT);
-//    pinMode(leds::minutes, OUTPUT);
-//    pinMode(leds::to, OUTPUT);
-//    pinMode(leds::past, OUTPUT);
-//    for (short i = 0; i < 12; i++)
-//        pinMode(leds::hourNums[i], OUTPUT);
-
-//    digitalWrite(leds::it_is, HIGH);
 }
 
 
 void loop() {
-//    digitalWrite(leds::it_is, LOW);
-//    for (short i=0;i<7;i++)
-//        digitalWrite(leds::minuteNums[i], LOW);
-//    digitalWrite(leds::minutes, LOW);
-//    digitalWrite(leds::to, LOW);
-//    digitalWrite(leds::past, LOW);
-//    for (short i = 0; i < 12; i++)
-//        digitalWrite(leds::hourNums[i], LOW);
-
-
-    //delay(1000);
-    //adjustTime(120); // Speed up time 2 minutes per loop
-
     #ifdef ARDUINO
     if (Serial.available()) processTimeSyncMessage();
     #endif // ARDUINO
@@ -264,7 +241,7 @@ void printTime() {
 #ifdef ARDUINO
 
 #ifdef LEDARRAY
-#define PRINT(...) do {disp.print(__VA_ARGS__); Serial.print(__VA_ARGS);} while (0)
+#define PRINT(...) do {disp.print(__VA_ARGS__); Serial.print(__VA_ARGS__);} while (0)
 
 #else //LEDARRAY
 #define PRINT(...) Serial.print(__VA_ARGS__)
@@ -298,5 +275,5 @@ void printTime() {
     if(states[leds::hourNums[11]])  PRINT("twelve ");
     if(states[leds::minuteNums[0]]) PRINT("o'clock ");
 
-    PRINT("\n");
+    PRINT("\r\n");
 }
